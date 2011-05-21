@@ -1,0 +1,7 @@
+Webkit Terminal
+
+Plan:
+1. almost terminal emulator: just pipes, no pty window size properties
+2. terminal emulator
+3. output format recognition: when output is like BM....{binary data}, draw that image
+4. custom esc sequences

@@ -1,0 +1,49 @@
+<html>
+<head>
+<style>
+body {
+	background-color:white;
+	color:black;
+	margin:0;
+	height:600px;
+	width:800px;
+	overflow:none;
+	vertical-align:bottom;
+}
+#scroller {
+	overflow-y:scroll;
+	height:100%;
+	vertical-align:bottom;
+}
+#main {
+	position:absolute;
+	display:inline;
+    bottom: 0px;
+    left:0px;
+	width:100%;
+}
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script>
+function print(text) {
+	$('#main').append(text);
+	$("#scroller").scrollTop(1000000);
+}
+function test(p1) {
+	print("test!!" + p1);
+}
+function x() {
+	print("test<br/>"+$('#main').height());
+	setTimeout(x,25);
+}
+//x();
+Bar();
+</script>
+</head>
+<body>
+<div id="scroller">
+<div id="main">
+terminal ok lol<br/>
+</div></div>
+</body>
+</html>
