@@ -48,6 +48,7 @@ static void load_status_cb(GObject* object, GParamSpec* pspec, gpointer data) {
 
 int pipeFdIn[2];
 int pipeFdOut[2];
+int fdMaster;
 
 static JSValueRef sendToInput(JSContextRef ctx, JSObjectRef /*function*/, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
 	assert(argumentCount==1);
@@ -111,8 +112,36 @@ static void onPipeRead(GObject *source, GAsyncResult *res, gpointer user_data) {
 	g_input_stream_read_async(inputStream, bufInput, 4096, G_PRIORITY_DEFAULT, NULL, onPipeRead,NULL);
 	
 }
+#include <pty.h> /* for openpty and forkpty */
+#include <utmp.h> /* for login_tty */ 
+
+void connect_shell() {
+	GInputStream * inputStream = g_unix_input_stream_new(pipeFdOut[0],false);
+	g_input_stream_read_async(inputStream, bufInput, 4096, G_PRIORITY_DEFAULT, NULL, onPipeRead,NULL);
+}
 
 void run_shell() {
+	termios tio ;
+	winsize winp ;
+	char buf[1024];
+	int pid = forkpty(&fdMaster, buf, NULL,NULL);//&tio, &winp);
+	if (pid==0) {
+		execlp("/bin/bash","/bin/bash","-i","-l",NULL);
+		exit(EXIT_FAILURE);
+	}
+	/*int fdSlave;
+	openpty(&fdMaster,&fdSlave,NULL,NULL,NULL);
+	pid_t pid = fork();
+	printf("pid=%d, fdM=%d, fdS=%d\n",pid,fdMaster,fdSlave);
+	if (pid==0) {
+		login_tty(
+	}*/
+	pipeFdIn[0] = fdMaster;
+	pipeFdIn[1] = fdMaster;
+	pipeFdOut[0] = fdMaster;
+	pipeFdOut[1] = fdMaster;
+}
+void run_shell2() {
 	if (pipe(pipeFdIn) == -1) { perror("pipe"); exit(EXIT_FAILURE); }
 	if (pipe(pipeFdOut) == -1) { perror("pipe"); exit(EXIT_FAILURE); }
 
@@ -144,8 +173,6 @@ void run_shell() {
 		//write(pipeFdIn[0],"ASDF\n",5);close(pipeFdIn[0]);
 		//while (read(pipeFdOut[1], &buf, 1) > 0) write(STDOUT_FILENO,&buf,1);
 		
-		GInputStream * inputStream = g_unix_input_stream_new(pipeFdOut[0],false);
-		g_input_stream_read_async(inputStream, bufInput, 4096, G_PRIORITY_DEFAULT, NULL, onPipeRead,NULL);
 		/*while (read(pipeFd[0], &buf, 1) > 0)
 		write(STDOUT_FILENO, &buf, 1);
 		write(STDOUT_FILENO, "\n", 1);
@@ -159,7 +186,7 @@ void run_shell() {
 static void load_finished_cb(WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer data) {
 	printf("Finished downloading %s\n", webkit_web_view_get_uri(web_view));
 	webView = web_view;
-	run_shell();
+	connect_shell();
 }
 
 static void destroy_cb(GtkWidget* widget, gpointer data) {
@@ -171,6 +198,8 @@ int main(int argc, char* argv[]) {
 	GtkWidget* window;
 	WebKitWebView* web_view = NULL;
 
+	run_shell();
+
 	gtk_init(&argc, &argv);
 
 	if (argc == 1) {
@@ -178,7 +207,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 	uri = argv[1];
-
+	
 	if(!g_thread_supported())
 	g_thread_init(NULL);
 
