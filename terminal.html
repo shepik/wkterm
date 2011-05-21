@@ -11,23 +11,28 @@ body {
 	vertical-align:bottom;
 }
 #scroller {
-	overflow-y:scroll;
+	/*overflow-y:scroll;*/
 	height:100%;
 	vertical-align:bottom;
 }
 #main {
 	position:absolute;
 	display:inline;
+	overflow-y:scroll;
+	height:100%;
     bottom: 0px;
     left:0px;
 	width:100%;
+}
+PRE {
+	/*display:inline;*/
 }
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script>
 function print(text) {
-	$('#main').append(text);
-	$("#scroller").scrollTop(1000000);
+	$('#main').append("<pre>"+text+"</pre>");
+	$("#main").scrollTop(1000000);
 }
 function test(p1) {
 	print("test!!" + p1);
@@ -37,7 +42,14 @@ function x() {
 	setTimeout(x,25);
 }
 //x();
-Bar();
+//setTimeout(function(){sendToInput("ls\n");},1000);
+$(window).keypress(function(p) {
+//	print("keypress");
+//	console.log(p);
+	print(p.which);
+	sendToInput(p.which);
+//	sendToInput("ls\n");
+});
 </script>
 </head>
 <body>
