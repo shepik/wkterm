@@ -85,6 +85,7 @@ function processEsc(data,i) {
 			var t = i;
 			while (data.charCodeAt(i)>=32) i++;
 			setTitle(data.substring(t,i));
+			return i;
 		}
 	} else if (data[i]=='[') {
 		if (data[i+1]=='K') {
@@ -131,12 +132,32 @@ function processData(data) {
 			case 27:
 				i = processEsc(data,i+1);
 				break;
-			default: getLine().append('<span class="m'+forecolor+' m'+backcolor+'">'+ch+'</span>'); break;
+			default: write(ch); break;
 		}
 		i++;
 	}
+	write_finish();
+}
+var last_forecolor = forecolor;
+var last_backcolor = backcolor;
+var buf = '';
+function write(ch) {
+	if (last_forecolor == forecolor && last_backcolor == backcolor) {
+		buf+= ch;
+	} else {
+		write_finish();
+		last_forecolor = forecolor;
+		last_backcolor = backcolor;
+		buf = ch;
+	}
+}
+function write_finish() {
+	getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
+	buf = '';
+//	getLine().find('span:last').append(ch);
 }
 function addLine() {
+	write_finish();
 	$('#main').append('<div></div>');
 }
 function getLine() {
