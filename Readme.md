@@ -2,11 +2,13 @@
 
 wkterm is a Webkit Terminal. It's built with webkit-gtk, so it runs in linux. But the host application is very simple, so it can rather easily be ported to Mac.
 
-In difference with [TermKit](https://github.com/unconed/TermKit/) (which this project was inspired by), wkterm should be real terminal emulator and it does aim to host 'vim'.
+In difference with [TermKit](https://github.com/unconed/TermKit/) (which this project was inspired by), wkterm should be real terminal emulator and it does aim to host 'vim'. 
 Also, (which is the main purpose of the project, in fact) wkterm, like in TermKit, will have graphical features (such as inline image viewing. for example, cat image.jpg will show image in console. may be, graphical_ls will work like ls but with file icons. etc).
 Graphical features will be implemented in one of two ways (or maybe both):
+
 1. Custom escape sequences (so, cat file.jpg won't work)
 2. File format recognition (that's, when we see jpeg bitmap header, we treat it as bitmap, when we see video, we show video player. but cat file.avi will work!)
+
 
 
 ## Current todo:
