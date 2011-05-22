@@ -15,8 +15,6 @@
 
 WebKitWebView* webView = NULL;
 
-int pipeFdIn[2];
-int pipeFdOut[2];
 int fdMaster;
 
 static JSValueRef sendToInput(JSContextRef ctx, JSObjectRef /*function*/, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
@@ -26,14 +24,14 @@ static JSValueRef sendToInput(JSContextRef ctx, JSObjectRef /*function*/, JSObje
 	double num = JSValueToNumber(ctx,arguments[0],&ex);
 	char c = (char)num;
 	if (c=='\r') c = '\n';
-	write(pipeFdIn[1], &c, 1);
+	write(fdMaster, &c, 1);
 	std::cout << "writing.." << c << std::endl;
 /*	
 	JSStringRef str = JSValueToStringCopy(ctx, arguments[0], &ex);
 	char buf[4096];
 	JSStringGetUTF8CString(str, buf,4096);
 	std::cout << "writing.." << buf << std::endl;
-	write(pipeFdIn[1], buf, strlen(buf));
+	write(fdMaster, buf, strlen(buf));
 */	
 	return JSValueMakeUndefined(ctx);
 }
@@ -60,15 +58,15 @@ static void onPipeRead(GObject *source, GAsyncResult *res, gpointer user_data) {
 //	size_t size = (size_t)g_async_result_get_user_data(res);
 //	std::cout << size << std::endl;
 	if (main_len>0) {
-		for (int i=0;i<main_len;i++) std::cout << (char)bufInput[i] << (int)bufInput[i] << ", ";
-		std::cout << std::endl;
+		//for (int i=0;i<main_len;i++) std::cout << (bufInput[i]<32?'#':(char)bufInput[i]) << (int)bufInput[i] << ", ";
+		//std::cout << std::endl;
 		
 		cJSON *json = cJSON_CreateString(bufInput);
 		char *bufJson = cJSON_Print(json);
 		char buf[strlen(bufJson)+100];
-		std::cout << (int)bufJson[0] << ',' << (int)bufJson[1] << std::endl;
+//		std::cout << (int)bufJson[0] << ',' << (int)bufJson[1] << std::endl;
 		sprintf(buf,"print(%s);",bufJson);
-		std::cout << buf << std::endl;
+//		std::cout << buf << std::endl;
 		free(bufJson);
 		webkit_web_view_execute_script(webView, buf);
 	}
@@ -79,7 +77,7 @@ static void onPipeRead(GObject *source, GAsyncResult *res, gpointer user_data) {
 #include <utmp.h> /* for login_tty */ 
 
 void connect_shell() {
-	GInputStream * inputStream = g_unix_input_stream_new(pipeFdOut[0],false);
+	GInputStream * inputStream = g_unix_input_stream_new(fdMaster,false);
 	g_input_stream_read_async(inputStream, bufInput, 4096, G_PRIORITY_DEFAULT, NULL, onPipeRead,NULL);
 }
 
@@ -92,17 +90,6 @@ void run_shell() {
 		execlp("/bin/bash","/bin/bash","-i","-l",NULL);
 		exit(EXIT_FAILURE);
 	}
-	/*int fdSlave;
-	openpty(&fdMaster,&fdSlave,NULL,NULL,NULL);
-	pid_t pid = fork();
-	printf("pid=%d, fdM=%d, fdS=%d\n",pid,fdMaster,fdSlave);
-	if (pid==0) {
-		login_tty(
-	}*/
-	pipeFdIn[0] = fdMaster;
-	pipeFdIn[1] = fdMaster;
-	pipeFdOut[0] = fdMaster;
-	pipeFdOut[1] = fdMaster;
 }
 
 static void load_finished_cb(WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer data) {

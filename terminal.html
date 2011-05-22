@@ -19,10 +19,10 @@ body {
 	position:absolute;
 	display:inline;
 	overflow-y:scroll;
-	height:100%;
+	height:600px;
     bottom: 0px;
     left:0px;
-	width:100%;
+	width:800px;
 }
 PRE {
 /*	display:inline;*/
@@ -52,71 +52,11 @@ PRE {
 
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="esc_map.js"></script>
+<script type="text/javascript" src="terminal.js"></script>
 <script>
 
-//7, [91, 048, 149, ;59, 351, 149, m109, 
-/*
-27, 93, 48, 59, 114, 111, 111, 116, 64, 115, 97, 109, 111, 118, 97, 108, 58, 47, 100, 97, 116, 97, 47, 104, 111, 109, 101, 47, 119, 107, 116, 101, 114, 109, 7,
-print("]0;root@samoval:/data/home/wkterm");
-27, 91, 63, 49, 48, 51, 52, 104, 27, 91, 48, 49, 59, 51, 49, 109, 115, 97, 109, 111, 118, 97, 108, 27, 91, 48, 49, 59, 51, 52, 109, 32, 119, 107, 116, 101, 114, 109, 32, 35, 27, 91, 48, 48, 109, 32,
-print("[?1034h[01;31msamoval[01;34m wkterm #[00m ");
-
-7, ]93, 048, ;59, r114, o111, o111, t116, @64, s115, a97, m109, o111, v118, a97, l108, :58, /47, d100, a97, t116, a97, /47, h104, o111, m109, e101, /47, w119, k107, t116, e101, r114, m109, 7,
-print("]0;root@samoval:/data/home/wkterm");
-7, [91, ?63, 149, 048, 351, 452, h104, 7, [91, 048, 149, ;59, 351, 149, m109, s115, a97, m109, o111, v118, a97, l108, 7, [91, 048, 149, ;59, 351, 452, m109,  32, w119, k107, t116, e101, r114, m109,  32, #35, 7, [91, 048, 048, m109,  32,
-print("[?1034h[01;31msamoval[01;34m wkterm #[00m ");
-
-*/
-var backcolor = '01';
-var forecolor = '37';
-function digit(ch) {
-	return ch>='0' && ch<='9';
-}
-function setTitle(title) {
-/*	addLine();
-	getLine().append("Title: " + title);
-	addLine();*/
-	//todo: call C code
-}
-function processEsc(data,i) {
-	if (data[i]==']') {
-		if (digit(data[i+1]) && !digit(data[i+2])) {
-			i = i+3;
-			var t = i;
-			while (data.charCodeAt(i)>=32) i++;
-			setTitle(data.substring(t,i));
-			return i;
-		}
-	} else if (data[i]=='[') {
-		if (data[i+1]=='K') {
-			return i+1;
-		} else if (data[i+1]=='m') {
-			backcolor='01';
-			forecolor='37';
-			return i+1;
-		} else if (digit(data[i+1]) && data[i+2]=='m') {
-			backcolor='01';
-			forecolor='37';
-			return i+2;
-		} else if (digit(data[i+1]) && digit(data[i+2])) {
-			if (data[i+3]=='m') {
-				backcolor='01';
-				forecolor='37';
-				return i+3;
-			} else if (data[i+3]==';' && data[i+6]=='m') {
-				backcolor = data[i+1] + data[i+2];
-				forecolor = data[i+4] + data[i+5];
-				return i+6;
-			}
-		} else if (data[i+1]=='?' && digit(data[i+2]) && digit(data[i+3]) && digit(data[i+4]) && digit(data[i+5]) && data[i+6]=='h') {
-			var s = digit(data[i+2]) && digit(data[i+3]) && digit(data[i+4]) && digit(data[i+5]);
-			if (s=='1034') getLine().html("");
-			return i+6;
-		}
-	}
-	return i;
-}
-function processData(data) {
+function print(data) {
 	var res = "";
 	var l = data.length;
 	var i=0;
@@ -125,65 +65,38 @@ function processData(data) {
 		var c = data.charCodeAt(i);
 		switch(c) {
 			case 10://todo: beginning of the line
+				context.cursorX = 0;
 				break;
 			case 13:
-				addLine();
+				terminal.addLine();
 				break;
 			case 27:
-				i = processEsc(data,i+1);
+				data = data.substring(i);
+				var r = mapCompiled.match(data,context);
+				data = r[1];
+				l = data.length;
+				i = -1;
 				break;
-			default: write(ch); break;
+			default: terminal.write(ch); break;
 		}
 		i++;
 	}
-	write_finish();
+	terminal.write_finish();
 }
-var last_forecolor = forecolor;
-var last_backcolor = backcolor;
-var buf = '';
-function write(ch) {
-	if (last_forecolor == forecolor && last_backcolor == backcolor) {
-		buf+= ch;
-	} else {
-		write_finish();
-		last_forecolor = forecolor;
-		last_backcolor = backcolor;
-		buf = ch;
-	}
-}
-function write_finish() {
-	getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
-	buf = '';
-//	getLine().find('span:last').append(ch);
-}
-function addLine() {
-	write_finish();
-	$('#main').append('<div></div>');
-}
-function getLine() {
-	return $('#main div:last');
-}
-function print(text) {
-	processData(text);
-	//$('#main').append(ntext);
-//	$('#main').append("<pre>"+text+"</pre>");
-	$("#main").scrollTop(1000000);
-}
-//x();
-//setTimeout(function(){sendToInput("ls\n");},1000);
+
 $(window).keypress(function(p) {
-//	print("keypress");
-//	console.log(p);
-	//print(p.which);
 	sendToInput(p.which);
-//	sendToInput("ls\n");
 });
+
+//setTimeout(function(){$('body').text($('body').html());},2000);
+
 </script>
 </head>
 <body class="m01 m37">
-<div id="scroller">
-<div id="main">
-<div></div>
-</div></div>
+	<div id="scroller">
+		<div id="main">
+			<div></div>
+		</div>
+	</div>
 </body>
 </html>
