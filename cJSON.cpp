@@ -225,7 +225,8 @@ static char *print_string_ptr(const char *str)
 				case '\n':	*ptr2++='n';	break;
 				case '\r':	*ptr2++='r';	break;
 				case '\t':	*ptr2++='t';	break;
-				default: ptr2--;	break;	// eviscerate with prejudice.
+				//default: ptr2--;	break;	// eviscerate with prejudice.
+				default: ptr2--; *ptr2++=*(ptr-1);
 			}
 		}
 	}
