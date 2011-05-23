@@ -82,7 +82,7 @@ var terminal = (function(){
 		this.setCursorY(c);
 	}
 	this.init = function() {
-		for (var i=0;i<30;i++) $('#main').append('<div>&nbsp;</div>');//temporary
+		for (var i=0;i<30;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
 		appendLine();
 		line = lines[0];
@@ -102,21 +102,29 @@ var terminal = (function(){
 		lines[this.cursorY-1] = line;
 		flush();
 	};
+	this.line_backspace = function() {
+		line[this.cursorX] = ' ';
+		this.cursorX--;
+	}
 	this.setColor = function(col) {
 	};
 	this.setCursorX = function(p) {
 		this.cursorX = p;
-	}
+	};
+	this.insertDiv = function (data) {
+		$('#main').append('<div></div>');
+		$('#main > div:last').html(data);
+	};
 	function scrollUp() {
 		line = lineInitial.clone();
 		for (var i=0;i<lines.length;i++) lines[i] = lines[i+1];
 		lines[this.cursorY-1] = line;
-	}
+	};
 	function appendLine() {
-		$('#main').append('<div>&nbsp;</div>');
-		lineDiv = $('#main div:last');
+		$('#main').append('<pre>&nbsp;</pre>');
+		lineDiv = $('#main pre:last');
 		//lineDiv.css('background-color','blue');
-	}
+	};
 
 	this.setCursorY = function(p) {
 		flush();
@@ -128,7 +136,7 @@ var terminal = (function(){
 			appendLine();
 			flush();
 		} else {
-			var t = $('#main > div');
+			var t = $('#main > pre');
 			if (t.length<this.windowH) {
 				lineDiv = $(t[this.cursorY-1]);
 				if (!lineDiv.length) {
@@ -142,8 +150,13 @@ var terminal = (function(){
 			}
 			line = lines[this.cursorY-1];
 		}
-	}
-	
+	};
+	this.writeTab = function() {
+		var t = 1+8*Math.floor((this.cursorX-1+8)/8);
+		for (var i=this.cursorX+1;i<=t;i++) line[i-1] = " ";
+		this.cursorX = t;
+		this.flush();
+	};
 	return this;
 })();
 

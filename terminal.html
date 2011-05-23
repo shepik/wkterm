@@ -5,7 +5,7 @@ body {
 	background-color:white;
 	color:black;
 	margin:0;
-	height:600px;
+	height:500px;
 	width:800px;
 	overflow:none;
 	vertical-align:bottom;
@@ -19,12 +19,16 @@ body {
 	position:absolute;
 	display:inline;
 	overflow-y:scroll;
-	height:600px;
+	height:500px;
     bottom: 0px;
     left:0px;
 	width:800px;
+	font-family: terminal, courier new, courier;
+	font-size:12px;
+	color:white;
 }
 PRE {
+	margin:0;
 /*	display:inline;*/
 }
 .m01 { background-color: black; }
@@ -63,12 +67,19 @@ function print(data) {
 	while (i<l) {
 		var ch = data[i];
 		var c = data.charCodeAt(i);
+//		console.log(c);
 		switch(c) {
 			case 10://todo: beginning of the line
 				context.setCursorX(1);
 				break;
 			case 13:
 				context.setCursorY(context.cursorY+1);
+				break;
+			case 8:
+				context.line_backspace();
+				break;
+			case 9:
+				context.writeTab();
 				break;
 			case 27:
 				data = data.substring(i);
@@ -89,7 +100,9 @@ $(document).ready(function() {
 });
 
 $(window).keypress(function(p) {
+//	console.log(p.which);
 	sendToInput(p.which);
+	//console.log($('#main').html());
 });
 
 //setTimeout(function(){$('body').text($('body').html());},2000);

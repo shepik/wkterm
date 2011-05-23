@@ -1,0 +1,24 @@
+#!/usr/bin/php
+<?php
+function writeImage($data,$type) {
+	$content = array('<div style="margin:10px;"><img src="data:'.$type.';base64,');
+	$content[] = base64_encode($data);
+	$content[] = '"></div>';
+	$content = implode('',$content);
+	echo chr(27).'!'.strlen($content).'!';
+	echo $content;
+}
+if (count($argv)>1) {
+	for ($i=1;$i<count($argv);$i++) {
+		writeImage(file_get_contents($argv[$i]),'image');
+	}
+} else {
+	writeImage(file_get_contents('php://stdin'),'image');
+/*	usleep(10000);
+	$f = fopen('php://input','r');
+	$s = array();
+	while (!feof($f)) $s[] = fread($f,4096);
+	fclose($f);
+	writeImage(implode('',$s),'image');
+*/
+}

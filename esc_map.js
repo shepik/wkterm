@@ -28,7 +28,7 @@ var map = {
 	'ESC [ ? Pm h': nothing,	//DEC Private Mode Set (DECSET)
 	'ESC [ ? Pm l': nothing,	//DEC Private Mode Reset (DECRST)
 	'ESC [ ? Pm r': nothing,	//Restore DEC Private Mode Values
-		
+	
 //	'ESC =': nothing, //Application Keypad (DECPAM).
 //	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
 	'CSI Ps ; Ps r': function(top,bottom) { this.setCursorX(1); this.setCursorY(1); }, //set scrolling region - DECSTBM - TODO: You cannot perform scrolling outside the margins.
@@ -37,6 +37,13 @@ var map = {
 	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
 	'CSI Ps l':nothing,//Reset Mode (RM).
 	'CSI Ps G':function(p) { this.setCursorX(p?p:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
+
+	'ESC ! Ps ! ': function(len) {
+		return function(text,pos){
+			this.insertDiv(text.substr(pos,len));
+			return [true, text.substring(pos+len)];
+		};
+	},
 
 	dummy:null
 };
@@ -49,6 +56,7 @@ map.forEach(function(func, k) {
 	key = key.replaceAll('CSI','ESC [');
 	key = key.replaceAll('[','\\[');
 	key = key.replaceAll('?','\\?');
+	key = key.replaceAll('!','\\!');
 	key = key.replaceAll('(','\\(');
 	
 	key = key.replaceAll('Ps','(NUM*)');
@@ -73,9 +81,12 @@ mapCompiled.match = function(text,context) {
 			var f = this[i][1];
 			var args = [];
 			for (var i=1;i<m.length;i++) args.push(m[i]);
-			f.apply(context,args);
-			//console.log(text.substring(m[0].length));
-			return [true,text.substring(m[0].length)];
+			var ret = f.apply(context,args);
+			if (ret) {
+				return ret.apply(context,[text,m[0].length]);
+			} else {
+				return [true,text.substring(m[0].length)];
+			}
 		}
 	}
 	var s = "";
