@@ -39,7 +39,10 @@ var map = {
 	'CSI Ps G':function(p) { this.setCursorX(p?p:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
 
 	'ESC ! Ps ! ': function(len) {
+		len = len*1;
 		return function(text,pos){
+			console.log("waiting for "+(pos+len)+", now "+text.length);
+			if (text.length<pos+len) return false;
 			this.insertDiv(text.substr(pos,len));
 			return [true, text.substring(pos+len)];
 		};

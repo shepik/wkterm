@@ -60,8 +60,13 @@ PRE {
 <script type="text/javascript" src="terminal.js"></script>
 <script>
 
+var data_prev = '';
 function print(data) {
 	var res = "";
+	if (data_prev) {
+		data = data_prev + data;
+		data_prev = "";
+	}
 	var l = data.length;
 	var i=0;
 	while (i<l) {
@@ -84,6 +89,10 @@ function print(data) {
 			case 27:
 				data = data.substring(i);
 				var r = mapCompiled.match(data,context);
+				if (!r) {
+					data_prev = data;
+					return;	//we shall wait for next packet
+				}
 				data = r[1];
 				l = data.length;
 				i = -1;
