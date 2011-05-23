@@ -23,4 +23,8 @@ Graphical features will be implemented in one of two ways (or maybe both):
 
 ## Screenshots:
 
-![the only screenshot](http://clip2net.com/clip/m31984/1306026783-clip-70kb.png)
+current version:
+![sorry, no cursor yet](http://clip2net.com/clip/m31984/1306180711-clip-197kb.png)
+
+old version:
+![old screenshot](http://clip2net.com/clip/m31984/1306026783-clip-70kb.png)
