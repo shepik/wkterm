@@ -65,10 +65,10 @@ function print(data) {
 		var c = data.charCodeAt(i);
 		switch(c) {
 			case 10://todo: beginning of the line
-				context.cursorX = 0;
+				context.setCursorX(1);
 				break;
 			case 13:
-				terminal.addLine();
+				context.setCursorY(context.cursorY+1);
 				break;
 			case 27:
 				data = data.substring(i);
@@ -81,8 +81,12 @@ function print(data) {
 		}
 		i++;
 	}
-	terminal.write_finish();
+	terminal.flush();
+	$('#main').scrollTop(1000000);
 }
+$(document).ready(function() {
+	terminal.init();
+});
 
 $(window).keypress(function(p) {
 	sendToInput(p.which);
@@ -95,7 +99,6 @@ $(window).keypress(function(p) {
 <body class="m01 m37">
 	<div id="scroller">
 		<div id="main">
-			<div></div>
 		</div>
 	</div>
 </body>

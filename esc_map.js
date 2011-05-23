@@ -1,18 +1,3 @@
-
-/*this object:
-bind (func) - binds func to this
-cursorX
-line
-color
-
-*/
-
-//CSI: ESC [
-//Ps: number
-//Pm : multiple numbers
-//Char: one letter character
-//String: any printable chars sequence
-//NP: non-printable character
 Object.prototype.forEach = function(func) {
 	for (var key in this) {
 		func(this[key], key);
@@ -23,20 +8,35 @@ String.prototype.replaceAll = function (find,replaceWith) {
 	return this.split(find).join(replaceWith);
 };
 var nothing = function(){};
+
+
+//CSI: ESC [
+//Ps: number
+//Pm : multiple numbers
+//Char: one letter character
+//String: any printable chars sequence
+//NP: non-printable character
 var map = {
-	'CSI Ps K' : function(p) { if (p==0) this.line = this.line.substring(this.cursorX); else if (p==1) this.line = this.line.substring(0,this.cursorX); else this.line = '';}, //Erase in Line (EL).
+	'CSI Ps K' : function(p) { if (p==0 || typeof(p)=='undefined') this.line_removeFrom(this.cursorX); else if (p==1) this.line_removeTo(this.cursorX); else this.line_clear();}, //Erase in Line (EL).
 	'CSI Pm m' : function(attr) { arguments.forEach(this.bind(function(arg){ this.setColor(0);/*set color*/ })) }, //Character Attributes (SGR).
-	'CSI Ps ; Ps H' : function(x,y) { this.cursorX = x?x*1:1; this.cursorY = y?y*1:1; }, //Cursor Position [row;column] (default = [1,1]) (CUP).
-	'CSI Ps H' : function(x) { this.cursorX = x?x*1:1; this.cursorY = 1; }, //Cursor Position [row;column] (default = [1,1]) (CUP).
+	'CSI Ps ; Ps H' : function(y,x,z) { clog1(y+"," + x + " => pos");this.setCursorY(y?y*1:1); this.setCursorX(x?x*1:1); }, //Cursor Position [row;column] (default = [1,1]) (CUP).
+	'CSI Ps H' : function(y) { this.setCursorX(1); this.setCursorY(y?y*1:1); }, //Cursor Position [row;column] (default = [1,1]) (CUP).
 	'ESC ( Char': function(ch) { }, //Designate G0 Character Set (ISO 2022, VT100).
 	'ESC ] Ps ; String NP': function(mode,str) { this.title = str; }, //set title or icon
-	'ESC [ ? Pm h': function (num) {},	//DEC Private Mode Set (DECSET).
-	'ESC =': nothing, //Application Keypad (DECPAM).
-	'ESC [ ? Pm l': function (num) {},	//DEC Private Mode Reset (DECRST).
-	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
-	'CSI Ps ; Ps r': nothing, //set scrolling region - todo
-	'CSI Ps J':function(mode) {  },//Erase in Display (ED).
-	'CSI Ps C':function(cnt) { this.cursorX += cnt?cnt:1; }, //Cursor Forward Ps Times (default = 1) (CUF).
+
+//cursor
+	'ESC [ ? Pm h': nothing,	//DEC Private Mode Set (DECSET)
+	'ESC [ ? Pm l': nothing,	//DEC Private Mode Reset (DECRST)
+	'ESC [ ? Pm r': nothing,	//Restore DEC Private Mode Values
+		
+//	'ESC =': nothing, //Application Keypad (DECPAM).
+//	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
+	'CSI Ps ; Ps r': function(top,bottom) { this.setCursorX(1); this.setCursorY(1); }, //set scrolling region - DECSTBM - TODO: You cannot perform scrolling outside the margins.
+	'CSI Ps J':function(opt) { if (opt!=2) clog2("Ps J "+opt); this.clearAll();   },//Erase in Display (ED).
+	'CSI Ps C':function(cnt) { this.setCursorX(this.cursorX + cnt?cnt:1); }, //Cursor Forward Ps Times (default = 1) (CUF).
+	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
+	'CSI Ps l':nothing,//Reset Mode (RM).
+	'CSI Ps G':function(p) { this.setCursorX(p?p:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
 
 	dummy:null
 };
@@ -52,7 +52,7 @@ map.forEach(function(func, k) {
 	key = key.replaceAll('(','\\(');
 	
 	key = key.replaceAll('Ps','(NUM*)');
-	key = key.replaceAll('Pm','(|(NUM+)(?:;(NUM+))*)');
+	key = key.replaceAll('Pm','(?:|(NUM+)(?:;(NUM+))*)');
 	key = key.replaceAll('Char','([a-zA-Z])');
 //	key = key.replaceAll('String','([[:print:]]*)');
 //	key = key.replaceAll('NP','[^[:print:]]');
@@ -72,9 +72,8 @@ mapCompiled.match = function(text,context) {
 		if (m) {
 			var f = this[i][1];
 			var args = [];
-			for (var i=2;i<m.length;i++) args.push(m[i]);
+			for (var i=1;i<m.length;i++) args.push(m[i]);
 			f.apply(context,args);
-			//console.log(m[0]);
 			//console.log(text.substring(m[0].length));
 			return [true,text.substring(m[0].length)];
 		}
