@@ -1,0 +1,72 @@
+#!/usr/bin/php
+<?php
+function write($files) {
+	$content = array();
+	$content[] = '<div>';
+	foreach ($files as $file) {
+		if (basename($file)=='.' || basename($file)=='..') continue;
+		$ext = pathinfo($file, PATHINFO_EXTENSION);
+		if ($ext=='jpg') {
+			$content[] = '<span style="position:relative;display:inline-block;align-vertical:middle;height:60px;width:160px;overflow:hidden;border:1px solid #808080;">';
+
+			$image = new Imagick($file);
+			ImageHelper::thumbnailImage($image,60,60);
+			$image->setImageFormat('jpeg');
+			$data = $image->getImageBlob();
+//			$image->destroy();
+
+			$content[] = '<img src="data:image/jpeg;base64,';
+			$content[] = base64_encode($data);
+			$content[] = '" style="float:left">';
+			$content[] = htmlspecialchars(basename($file)).'</span>';
+		} else {
+			$content[] = '<div style="display:inline-block;height:60px;width:100px;padding-left:60px;border:1px solid #808080;">'.htmlspecialchars(basename($file)).'</div>';
+		}
+	}
+	$content[] = '</div>';
+	
+	$content = implode('',$content);
+	echo chr(27).'!'.strlen($content).'!';
+	echo $content;
+}
+
+
+for ($i=1;$i<count($argv);$i++) {
+	if (is_dir($argv[$i])) {
+		write(glob($argv[$i].'/*'));
+	} else {
+		write(array($argv[$i]));
+	}
+}
+
+
+
+class ImageHelper {
+	private static function scaleTo($srcW,$srcH, $dstW, $dstH) {
+		$srcF = $srcW/$srcH;
+		$dstF = $dstW/$dstH;
+		if ($dstF>=$srcF) {
+			//вторая - шире
+			$w = $srcW;
+			$h = $w / $dstF;
+		} else {
+			$h = $srcH;
+			$w = $h * $dstF;
+		}
+		return array(round($w),round($h));
+	}
+	public static function thumbnailImage($Image, $dstW, $dstH,$wfactor = 0.5, $hfactor = 0.5) {
+		$srcW = $Image->getImageWidth();
+		$srcH = $Image->getImageHeight();
+		if ($srcW == $dstW && $srcH==$dstH) return;
+		list($w,$h) = self::scaleTo($srcW,$srcH,$dstW,$dstH);
+		if ($w != $srcW || $h!=$srcH) {
+			//crop
+			$dw = floor(($srcW - $w)*$wfactor);
+			$dh = floor(($srcH - $h)*$hfactor);
+			$Image->cropImage($w,$h,$dw,$dh);
+		}
+		
+		$Image->resizeImage($dstW,$dstH,Imagick::FILTER_CATROM,1);
+	}
+}

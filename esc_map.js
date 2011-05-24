@@ -17,7 +17,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 
-
 //CSI: ESC [
 //Ps: number
 //Pm : multiple numbers
@@ -50,6 +49,10 @@ var map = {
 	'CSI Ps M': function(p) { this.lines_removeDown(p?p:1);}, //Delete Ps Line(s) (default = 1) (DL).
 	'CSI Ps X' : function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_backspace(); },  //todo //Erase Ps Character(s) (default = 1) (ECH).
 	'CSI Ps P': function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_delete(); }, //Delete Ps Character(s) (default = 1) (DCH).
+		
+	'ESC 7': function() { this.oldX = this.cursorX; this.oldY = this.cursorY; }, //Save Cursor (DECSC).
+	'ESC 8': function() { this.setCursorX(this.oldX); this.setCursorY(this.oldY); }, //Restore Cursor (DECRC).
+		
 	'ESC ! Ps ! ': function(len) {
 		len = len*1;
 		return function(text,pos){

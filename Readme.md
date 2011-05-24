@@ -7,7 +7,7 @@ Also, which is in fact the main purpose of the project, wkterm have graphical fe
 
 ## Current todo:
 
-1. Proper keyboard handling. I press any non-character key (like arrow-up, or F1, or Ctrl+C, or Esc), esc-sequence should be sent.
+1. (almost done) Proper keyboard handling. I press any non-character key (like arrow-up, or F1, or Ctrl+C, or Esc), esc-sequence should be sent.
 	http://sunsite.ualberta.ca/Documentation/Gnu/screen-3.9.4/html_chapter/screen_11.html#SEC60
 	https://github.com/pnitsch/jsTerm
 	http://anyterm.org/download/index.html
