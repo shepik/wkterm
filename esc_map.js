@@ -98,7 +98,7 @@ mapCompiled.match = function(text,terminal) {
 			var args = [];
 			for (var i=1;i<m.length;i++) args.push(m[i]);
 			var ret = f.apply(terminal,args);
-			console.log(m[0]);
+			//console.log(m[0]);
 			if (ret) {
 				return ret.apply(terminal,[text,m[0].length]);
 			} else {
