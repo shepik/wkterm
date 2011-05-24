@@ -230,8 +230,7 @@ Scroll down Ps lines (default = 1) (SD).
 CSI Ps ; P
 s ; Ps ; Ps ; Ps T
 Initiate highlight mouse tracking. Parameters are [func;startx;starty;firstrow;lastrow]. See the section Mouse Tracking.
-CSI > Ps ;
-Ps T
+CSI > Ps ; Ps T
 Reset one or more features of the title modes to the default value. Normally, "reset" disables the feature. It is possible to disable the ability to reset features by compiling a different default for the title modes into xterm.
 Ps = 0 → Do not set window/icon labels using hexadecimal. 
 Ps = 1 → Do not query window/icon labels using hexadecimal. 

@@ -1,47 +1,35 @@
-Object.prototype.bind = function(func) {
-	var self = this;
-	return function() {
-		return func.apply(self,arguments);
-	};
-};
-String.prototype.replaceAt=function(index, char) {
-	return this.substr(0, index) + char + this.substr(index+char.length);
-}
-Object.prototype.clone = function() {
-  var newObj = (this instanceof Array) ? [] : {};
-  for (i in this) {
-    if (i == 'clone') continue;
-    if (this[i] && typeof this[i] == "object") {
-      newObj[i] = this[i].clone();
-    } else newObj[i] = this[i]
-  } return newObj;
-};
+// 
+// This file is the part of wkterm, webkit-based terminal emulator
+// (C) 2011 Ilya Shapovalov
 
-var context_old = {
-	bind : function(func) {
-		var self = this;
-		return function() {
-			return func.apply(self,arguments);
-		};
-	},
-	cursorX: 0,
-	cursorY: 0,
-	line: '',
-	backcolor: '01',
-	forecolor: '37',
-	setColor: function(col) {
-	},
-	title: 'main',
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
 
-	dummy:null
-};
+
+//debug levels
 
 var clog1 = nothing;
 var clog2 = nothing;
 var clog3 = nothing;
 var clog4 = nothing;
-
-
+/*
+var clog1 = function(p) {console.log(p);};
+var clog2 = function(p) {console.log(p);};
+var clog3 = function(p) {console.log(p);};
+var clog4 = function(p) {console.log(p);};
+*/
 var terminal = (function(){
 	this.backcolor = '01';
 	this.forecolor = '37';
@@ -66,8 +54,9 @@ var terminal = (function(){
 		clog1(this.cursorY+","+this.cursorX + " - " + ch);
 		line[this.cursorX-1] = ch;
 		this.cursorX++;
+		//if (this.cursorX>80) this.setCursorX(1);
 //		if (this.cursorX>80) this.cursorX = 1;
-		//if (this.cursorX>80) {this.cursorX = 1; this.addLine();}
+		
 	}
 	
 	this.flush = flush;
@@ -86,11 +75,12 @@ var terminal = (function(){
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
 		appendLine();
 		line = lines[0];
+		this.cursorY = 0;
 		this.setCursorY(1);
 		//lineDiv.css('background-color','yellow');
 	};
-	this.line_removeFrom = function(p) {
-		for (var i=p+1;i<=this.windowW;i++) line[i-1] = " ";
+	this.line_removeFrom = function(p,cnt) {
+		for (var i=p;i<=this.windowW;i++) line[i-1] = " ";
 		flush();
 	};
 	this.line_removeTo = function(p) {
@@ -102,9 +92,22 @@ var terminal = (function(){
 		lines[this.cursorY-1] = line;
 		flush();
 	};
+	this.line_delete = function() {
+		line[this.cursorX-1] =  ' ';
+		this.cursorX++;
+	}
 	this.line_backspace = function() {
-		line[this.cursorX] = ' ';
 		this.cursorX--;
+		line[this.cursorX-1] = ' ';
+	}
+	this.lines_removeDown = function(cnt) {
+		var cy = this.cursorY;
+		for (var i=0;i<cnt;i++) {
+			this.setCursorY(cy+i);
+			this.line_clear();
+		}
+		this.setCursorY(cy);
+		//todo:scroll
 	}
 	this.setColor = function(col) {
 	};
@@ -127,6 +130,7 @@ var terminal = (function(){
 	};
 
 	this.setCursorY = function(p) {
+		if (p==this.cursorY) return;
 		flush();
 		this.cursorY = p;
 		if (this.cursorY>this.windowH) {
@@ -160,4 +164,3 @@ var terminal = (function(){
 	return this;
 })();
 
-var context = terminal;

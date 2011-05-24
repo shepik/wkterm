@@ -56,8 +56,10 @@ PRE {
 
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="prototypes.js"></script>
 <script type="text/javascript" src="esc_map.js"></script>
 <script type="text/javascript" src="terminal.js"></script>
+<script type="text/javascript" src="keyboard.js"></script>
 <script>
 
 var data_prev = '';
@@ -75,20 +77,23 @@ function print(data) {
 //		console.log(c);
 		switch(c) {
 			case 10://todo: beginning of the line
-				context.setCursorX(1);
+				terminal.setCursorX(1);
 				break;
 			case 13:
-				context.setCursorY(context.cursorY+1);
+				terminal.setCursorY(terminal.cursorY+1);
+				terminal.setCursorX(1);
 				break;
 			case 8:
-				context.line_backspace();
+			console.log('<=');
+				terminal.setCursorX(terminal.cursorX-1);
+//				terminal.line_backspace();
 				break;
 			case 9:
-				context.writeTab();
+				terminal.writeTab();
 				break;
 			case 27:
 				data = data.substring(i);
-				var r = mapCompiled.match(data,context);
+				var r = mapCompiled.match(data,terminal);
 				if (!r) {
 					data_prev = data;
 					return;	//we shall wait for next packet
@@ -108,17 +113,18 @@ $(document).ready(function() {
 	terminal.init();
 });
 
-$(window).keypress(function(p) {
+/*$(window).keypress(function(p) {
 //	console.log(p.which);
 	sendToInput(p.which);
 	//console.log($('#main').html());
-});
+});*/
 
 //setTimeout(function(){$('body').text($('body').html());},2000);
 
 </script>
 </head>
 <body class="m01 m37">
+<input type="text" id="paster" style="display:none;width:100px;position:absolute;left:0px;top:0px;"/>
 	<div id="scroller">
 		<div id="main">
 		</div>

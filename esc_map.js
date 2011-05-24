@@ -1,13 +1,21 @@
-Object.prototype.forEach = function(func) {
-	for (var key in this) {
-		func(this[key], key);
-	}
-	return this;
-};
-String.prototype.replaceAll = function (find,replaceWith) {
-	return this.split(find).join(replaceWith);
-};
-var nothing = function(){};
+// 
+// This file is the part of wkterm, webkit-based terminal emulator
+// (C) 2011 Ilya Shapovalov
+
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+//
 
 
 //CSI: ESC [
@@ -29,15 +37,19 @@ var map = {
 	'ESC [ ? Pm l': nothing,	//DEC Private Mode Reset (DECRST)
 	'ESC [ ? Pm r': nothing,	//Restore DEC Private Mode Values
 	
-//	'ESC =': nothing, //Application Keypad (DECPAM).
-//	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
+	'ESC =': nothing, //Application Keypad (DECPAM). called when opening vim
+	'ESC >': nothing, //Normal Keypad. called when closing vim
+	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
+		
 	'CSI Ps ; Ps r': function(top,bottom) { this.setCursorX(1); this.setCursorY(1); }, //set scrolling region - DECSTBM - TODO: You cannot perform scrolling outside the margins.
 	'CSI Ps J':function(opt) { if (opt!=2) clog2("Ps J "+opt); this.clearAll();   },//Erase in Display (ED).
 	'CSI Ps C':function(cnt) { this.setCursorX(this.cursorX + cnt?cnt:1); }, //Cursor Forward Ps Times (default = 1) (CUF).
 	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
 	'CSI Ps l':nothing,//Reset Mode (RM).
 	'CSI Ps G':function(p) { this.setCursorX(p?p:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
-
+	'CSI Ps M': function(p) { this.lines_removeDown(p?p:1);}, //Delete Ps Line(s) (default = 1) (DL).
+	'CSI Ps X' : function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_backspace(); },  //todo //Erase Ps Character(s) (default = 1) (ECH).
+	'CSI Ps P': function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_delete(); }, //Delete Ps Character(s) (default = 1) (DCH).
 	'ESC ! Ps ! ': function(len) {
 		len = len*1;
 		return function(text,pos){
@@ -77,16 +89,18 @@ map.forEach(function(func, k) {
 	key = "^"+key;
 	mapCompiled.push([new RegExp(key), func]);
 });
-mapCompiled.match = function(text,context) {
+
+mapCompiled.match = function(text,terminal) {
 	for (var i=0;i<this.length;i++) {
 		var m = this[i][0].exec(text);
 		if (m) {
 			var f = this[i][1];
 			var args = [];
 			for (var i=1;i<m.length;i++) args.push(m[i]);
-			var ret = f.apply(context,args);
+			var ret = f.apply(terminal,args);
+			console.log(m[0]);
 			if (ret) {
-				return ret.apply(context,[text,m[0].length]);
+				return ret.apply(terminal,[text,m[0].length]);
 			} else {
 				return [true,text.substring(m[0].length)];
 			}
@@ -99,4 +113,4 @@ mapCompiled.match = function(text,context) {
 	return [false,text.substring(1)];
 };
 //console.log(mapCompiled);
-//console.log(mapCompiled.match(String.fromCharCode(27)+"[01;31masd",context));
+//console.log(mapCompiled.match(String.fromCharCode(27)+"[01;31masd",terminal));
