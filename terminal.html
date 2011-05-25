@@ -27,9 +27,13 @@ body {
 	font-size:12px;
 	color:white;
 }
-PRE {
+#main PRE {
 	margin:0;
 /*	display:inline;*/
+}
+#main PRE B {
+	background-color:#008000;
+	font-weight:normal;
 }
 .m01 { background-color: black; }
 .m37 { color: white; }
@@ -83,8 +87,10 @@ function print(data) {
 				terminal.setCursorY(terminal.cursorY+1);
 				terminal.setCursorX(1);
 				break;
+			case 7:
+				//bell. do nothing
+				break;
 			case 8:
-			console.log('<=');
 				terminal.setCursorX(terminal.cursorX-1);
 //				terminal.line_backspace();
 				break;
@@ -107,6 +113,7 @@ function print(data) {
 		i++;
 	}
 	terminal.flush();
+	terminal.flushCursor();
 	$('#main').scrollTop(1000000);
 }
 $(document).ready(function() {

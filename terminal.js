@@ -44,7 +44,20 @@ var terminal = (function(){
 	for (var i=0;i<this.windowW;i++) lineInitial.push(" ");
 	var line = lineInitial.clone();
 	
-	function flush(b) {
+	var cursorXprev = -1;
+	var cursorYprev = -1;
+	this.flushCursor = function() {
+		if (this.cursorXprev>0 && this.cursorYprev>0) {
+			var y = this.cursorY;
+			this.setCursorY(this.cursorYprev);
+			this.flush();
+			this.setCursorY(y);
+		}
+		var str = line.join('');
+		var res = str.substr(0,this.cursorX-1) + "<b>" + str[this.cursorX-1] + "</b>" + str.substr(this.cursorX);
+		lineDiv.html(res+"&nbsp;");
+	}
+	function flush() {
 	//	getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
 		//console.log(this.cursorX+"-"+this.cursorY+line.join(''));
 		lineDiv.html(line.join('')+"&nbsp;");
@@ -57,6 +70,11 @@ var terminal = (function(){
 		//if (this.cursorX>80) this.setCursorX(1);
 //		if (this.cursorX>80) this.cursorX = 1;
 		
+	}
+	
+	function setLine(newline) {
+		line = newline;
+		lines[this.cursorY-1] = line;
 	}
 	
 	this.flush = flush;
@@ -88,18 +106,27 @@ var terminal = (function(){
 		flush();
 	};
 	this.line_clear = function() {
-		line = lineInitial.clone();
-		lines[this.cursorY-1] = line;
+		setLine(lineInitial.clone());
 		flush();
 	};
-	this.line_delete = function() {
-		line[this.cursorX-1] =  ' ';
-		this.cursorX++;
+	this.line_erase = function(p) {
+		for (var i=0;i<p;i++) {
+			line[this.cursorX-1] =  ' ';
+			this.cursorX++;
+		}
 	}
-	this.line_backspace = function() {
+	this.line_delete = function(p) {
+		for (var i=this.cursorX-1+p;i<=this.windowW;i++) {
+			line[i-p] = line[i];
+		}
+		for (var i=0;i<p;i++) {
+			line[this.windowW-i] = ' ';
+		}
+	}
+	/*this.line_backspace = function() {
 		this.cursorX--;
 		line[this.cursorX-1] = ' ';
-	}
+	}*/
 	this.lines_removeDown = function(cnt) {
 		var cy = this.cursorY;
 		for (var i=0;i<cnt;i++) {
@@ -121,7 +148,7 @@ var terminal = (function(){
 	function scrollUp() {
 		line = lineInitial.clone();
 		for (var i=0;i<lines.length;i++) lines[i] = lines[i+1];
-		lines[this.cursorY-1] = line;
+		setLine(line);
 	};
 	function appendLine() {
 		$('#main').append('<pre>&nbsp;</pre>');

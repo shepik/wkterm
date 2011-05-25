@@ -39,16 +39,16 @@ var map = {
 	'ESC =': nothing, //Application Keypad (DECPAM). called when opening vim
 	'ESC >': nothing, //Normal Keypad. called when closing vim
 	'CSI > Ps c': nothing, //Send Device Attributes (Secondary DA) - I SHOULD RESPOND!
-		
+
 	'CSI Ps ; Ps r': function(top,bottom) { this.setCursorX(1); this.setCursorY(1); }, //set scrolling region - DECSTBM - TODO: You cannot perform scrolling outside the margins.
 	'CSI Ps J':function(opt) { if (opt!=2) clog2("Ps J "+opt); this.clearAll();   },//Erase in Display (ED).
-	'CSI Ps C':function(cnt) { this.setCursorX(this.cursorX + cnt?cnt:1); }, //Cursor Forward Ps Times (default = 1) (CUF).
-	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
+	'CSI Ps C':function(cnt) { this.setCursorX(this.cursorX + (cnt?cnt*1:1)); }, //Cursor Forward Ps Times (default = 1) (CUF).
+	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p*1:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
 	'CSI Ps l':nothing,//Reset Mode (RM).
-	'CSI Ps G':function(p) { this.setCursorX(p?p:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
-	'CSI Ps M': function(p) { this.lines_removeDown(p?p:1);}, //Delete Ps Line(s) (default = 1) (DL).
-	'CSI Ps X' : function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_backspace(); },  //todo //Erase Ps Character(s) (default = 1) (ECH).
-	'CSI Ps P': function(p) { if(!p)p=1; for (var i=0;i<p;i++) this.line_delete(); }, //Delete Ps Character(s) (default = 1) (DCH).
+	'CSI Ps G':function(p) { this.setCursorX(p?p*1:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
+	'CSI Ps M': function(p) { this.lines_removeDown(p?p*1:1);}, //Delete Ps Line(s) (default = 1) (DL).
+	'CSI Ps X' : function(p) { this.line_erase(p?p*1:1); },  //todo //Erase Ps Character(s) (default = 1) (ECH).
+	'CSI Ps P': function(p) { this.line_delete(p?p*1:1); }, //Delete Ps Character(s) (default = 1) (DCH).
 		
 	'ESC 7': function() { this.oldX = this.cursorX; this.oldY = this.cursorY; }, //Save Cursor (DECSC).
 	'ESC 8': function() { this.setCursorX(this.oldX); this.setCursorY(this.oldY); }, //Restore Cursor (DECRC).
@@ -62,6 +62,10 @@ var map = {
 			return [true, text.substring(pos+len)];
 		};
 	},
+/* todo:
+ESC c
+Full Reset (RIS).
+*/
 
 	dummy:null
 };
@@ -101,7 +105,7 @@ mapCompiled.match = function(text,terminal) {
 			var args = [];
 			for (var i=1;i<m.length;i++) args.push(m[i]);
 			var ret = f.apply(terminal,args);
-			//console.log(m[0]);
+			clog2(m[0]);
 			if (ret) {
 				return ret.apply(terminal,[text,m[0].length]);
 			} else {
