@@ -67,7 +67,7 @@ var terminal = (function(){
 		clog1(this.cursorY+","+this.cursorX + " - " + ch);
 		line[this.cursorX-1] = ch;
 		this.cursorX++;
-		//if (this.cursorX>80) this.setCursorX(1);
+		if (this.cursorX>80) {this.setCursorX(1); this.setCursorY(this.cursorY+1);}
 //		if (this.cursorX>80) this.cursorX = 1;
 		
 	}
@@ -170,16 +170,16 @@ var terminal = (function(){
 			var t = $('#main > pre');
 			if (t.length<this.windowH) {
 				lineDiv = $(t[this.cursorY-1]);
-				if (!lineDiv.length) {
-					clog3(this.cursorY);
-					appendLine();
-					flush();
-				}
 			} else {
 				lineDiv = $(t[t.length - (this.windowH-this.cursorY)-1]);
 				//if (this.cursorY==1) lineDiv.css('background-color','red');
 			}
 			line = lines[this.cursorY-1];
+			if (!lineDiv.length) {
+				clog3(this.cursorY);
+				appendLine();
+				flush();
+			}
 		}
 	};
 	this.writeTab = function() {

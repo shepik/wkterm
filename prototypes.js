@@ -48,3 +48,16 @@ Object.prototype.clone = function() {
   } return newObj;
 };
 
+
+
+function printStackTrace() {
+	var callstack = [];
+	var currentFunction = arguments.callee.caller;
+	while (currentFunction) {
+		var fn = currentFunction.toString();
+		var fname = fn.substring(fn.indexOf("function") + 8, fn.indexOf("(")) || "anonymous";
+		callstack.push(fname);
+		currentFunction = currentFunction.caller;
+	}
+	console.info('stack trace', callstack.join("\n"));
+}

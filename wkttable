@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+	mb_internal_encoding('utf8');
+	$content = array('<div><table>');
+	$i = 0;
+	while (!feof(STDIN)) {
+		$line = fgets(STDIN);
+		$content[] = ($i&1)?'<tr class="odd">':'<tr>';
+		foreach (explode("\t",trim($line)) as $val) {
+			if (!$i) {
+				$content[] = '<th>'.htmlspecialchars($val).'</th>';
+			} else {
+				$content[] = '<td>'.htmlspecialchars($val).'</td>';
+			}
+		}
+		$content[] = '</tr>';
+		$i++;
+	}
+	$content[] = '</table></div>';
+	
+	$content = implode('',$content);
+	echo chr(27).'!'.mb_strlen($content).'!';
+	echo $content;

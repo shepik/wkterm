@@ -23,8 +23,8 @@ body {
     bottom: 0px;
     left:0px;
 	width:800px;
-	font-family: terminal, courier new, courier;
-	font-size:12px;
+	font-family: courier new,consolas,terminal,  courier;
+	font-size:13px;
 	color:white;
 }
 #main PRE {
@@ -56,7 +56,9 @@ body {
 .m47 { background-color: white; }
 .m49 { background-color: #808080; }
 
-
+table tr.odd {
+	background-color:#202020;
+}
 
 </style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
@@ -81,10 +83,11 @@ function print(data) {
 //		console.log(c);
 		switch(c) {
 			case 10://todo: beginning of the line
+				terminal.setCursorY(terminal.cursorY+1);
 				terminal.setCursorX(1);
 				break;
 			case 13:
-				terminal.setCursorY(terminal.cursorY+1);
+				//
 				terminal.setCursorX(1);
 				break;
 			case 7:
