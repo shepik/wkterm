@@ -35,8 +35,6 @@ body {
 	background-color:#008000;
 	font-weight:normal;
 }
-.m01 { background-color: black; }
-.m37 { color: white; }
 .m30 { color: black; }
 .m31 { color: red; }
 .m32 { color: green; }
@@ -45,7 +43,6 @@ body {
 .m35 { color: magenta; }
 .m36 { color: cyan; }
 .m37 { color: white; }
-.m39 { color: #808080; }
 .m40 { background-color: black; }
 .m41 { background-color: red; }
 .m42 { background-color: green; }
@@ -54,14 +51,22 @@ body {
 .m45 { background-color: magenta; }
 .m46 { background-color: cyan; }
 .m47 { background-color: white; }
-.m49 { background-color: #808080; }
+
+#cursor {
+	position:fixed;
+	left:0px;top:0px;
+	background:green;
+	color:green;
+	width:10px;
+	height:10px;
+}
 
 table tr.odd {
 	background-color:#202020;
 }
 
 </style>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="prototypes.js"></script>
 <script type="text/javascript" src="esc_map.js"></script>
 <script type="text/javascript" src="terminal.js"></script>
@@ -127,13 +132,15 @@ $(document).ready(function() {
 	terminal.init();
 	terminal.setSize($(window).width(), $(window).height());
 
+	$('#cursor').css({width: terminal.charW+"px", height: terminal.charH+"px"});
+
 });
 $(window).resize(function() {
-	var w= $(window).width()-20;
-	var h= $(window).height()-10;
-	terminal.setSize(w, h);
-	$('BODY').css({width:$(window).width(), height: $(window).height() });
-	$('#main').css({width:$(window).width(), height: $(window).height() });
+	var w= $(window).width();
+	var h= $(window).height();
+	terminal.setSize(w*1-20, h*1-10);
+	$('BODY').css({width:w+"px", height: h+"px" });
+	$('#main').css({width:w+"px", height: h+"px" });
 });
 
 
@@ -147,11 +154,12 @@ $(window).resize(function() {
 
 </script>
 </head>
-<body class="m01 m37">
+<body class="m40 m37">
 <input type="text" id="paster" style="display:none;width:100px;position:absolute;left:0px;top:0px;"/>
 	<div id="scroller">
 		<div id="main">
 			<pre id="singleChar"><span>Z</span></pre>
+			<div id="cursor">&nbsp;</div>
 		</div>
 	</div>
 </body>

@@ -29,6 +29,7 @@ var clog1 = function(p) {console.log(p);};
 var clog2 = function(p) {console.log(p);};
 var clog3 = function(p) {console.log(p);};
 var clog4 = function(p) {console.log(p);};
+/*
 */
 var terminal = (function(){
 	this.backcolor = '01';
@@ -38,43 +39,69 @@ var terminal = (function(){
 	this.charW = 9;
 	this.charH = 14;
 	
-	var last_forecolor = this.forecolor;
-	var last_backcolor = this.backcolor;
-	var lineInitial = [];
+	var attr = 7;
 	var lines = [];
+	var lineAttrs = [];
 	var lineDiv = null;
-	for (var i=0;i<this.windowW;i++) lineInitial.push(" ");
-	var line = lineInitial.clone();
+	var lineInitial;
+	var lineAttrInitial;
 	
-	var cursorXprev = -1;
-	var cursorYprev = -1;
+	function makeLineInitial() {
+		lineInitial = [];
+		lineAttrInitial = [];
+		for (var i=0;i<this.windowW;i++) lineInitial.push(" ");
+		for (var i=0;i<this.windowW;i++) lineAttrInitial.push(7);
+	}
+	makeLineInitial();
+	var line = lineInitial.clone();
+	var lineAttr = lineAttrInitial.clone();
+	
+	//var cursorXprev = -1;
+	//var cursorYprev = -1;
 	this.flushCursor = function() {
-		if (this.cursorXprev>0 && this.cursorYprev>0) {
-			var y = this.cursorY;
-			this.setCursorY(this.cursorYprev);
-			this.flush();
-			this.setCursorY(y);
-		}
-		var str = line.join('');
-		var res = str.substr(0,this.cursorX-1) + "<b>" + str[this.cursorX-1] + "</b>" + str.substr(this.cursorX);
-		lineDiv.html(res+"&nbsp;");
+		//if (this.cursorXprev>0 && this.cursorYprev>0) {
+		//	var y = this.cursorY;
+		//	this.setCursorY(this.cursorYprev);
+		//	this.flush();
+		//	this.setCursorY(y);
+		//}
+		//var str = line.join('');
+		//var res = str.substr(0,this.cursorX-1) + "<b>" + str[this.cursorX-1] + "</b>" + str.substr(this.cursorX);
+		//lineDiv.html(res+"&nbsp;");
+		console.log($('#main').height());
+		console.log(this.windowH);
+		console.log(this.cursorY);
+		$('#cursor').css('left',((this.cursorX-1)*this.charW)+"px").css('top',($('#main').height()-(1+this.windowH-this.cursorY)*this.charH)+"px") ;
+		console.log((this.cursorX-1)*this.charW);
+	}
+	function getColorClass(attr) {
+		return 'm3'+(attr&7)+' m4'+((attr>>3)&7);
 	}
 	function flush() {
-	//	getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
+		//getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
 		//console.log(this.cursorX+"-"+this.cursorY+line.join(''));
-		lineDiv.html(line.join('')+"&nbsp;");
+		var a = lineAttr[0];
+		var l = '<span class="'+getColorClass(a)+'">'+line[0];
+		for (var i=1;i<line.length;i++) {
+			if (lineAttr[i]==a) {
+				l += line[i];
+			} else {
+				a = lineAttr[i];
+				l += '</span><span class="'+getColorClass(a)+'">' + line[i];
+			}
+		}
+		l += '</span>';
+//		console.log(lineAttr.join(','));
+		lineDiv.html(l+"&nbsp;");
+		//lineDiv.html(line.join('')+"&nbsp;");
 		//if (b) lineDiv.css({'background-color':'red'});
 	}
 	function write(ch) {
 		if (this.cursorX>this.windowW) {this.setCursorX(1); this.setCursorY(this.cursorY+1);}
-		clog1(this.cursorY+","+this.cursorX + " - " + ch);
+		clog1(this.cursorY+","+this.cursorX + " - " + ch + "-" + attr);
 		line[this.cursorX-1] = ch;
+		lineAttr[this.cursorX-1] = attr;
 		this.cursorX++;
-	}
-	
-	function setLine(newline) {
-		line = newline;
-		lines[this.cursorY-1] = line;
 	}
 	
 	this.flush = flush;
@@ -91,8 +118,10 @@ var terminal = (function(){
 	this.init = function() {
 		for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
+		for (var i=0;i<this.windowH;i++) lineAttrs[i] = lineAttrInitial.clone();
 		appendLine();
 		line = lines[0];
+		lineAttr = lineAttrs[0];
 		this.cursorY = 0;
 		this.setCursorY(1);
 		//lineDiv.css('background-color','yellow');
@@ -101,7 +130,7 @@ var terminal = (function(){
 		var w = Math.floor(w_px/this.charW);
 		var h = Math.floor(h_px/this.charH);
 		if (w>0 && h>0) {
-			console.log(w+"x"+h);
+//			console.log(w+"x"+h);
 			this.windowW = w;
 			this.windowH = h;
 			setTerminalSize(h,w);
@@ -117,7 +146,10 @@ var terminal = (function(){
 		flush();
 	};
 	this.line_clear = function() {
-		setLine(lineInitial.clone());
+		line = lineInitial.clone();
+		lineAttr = lineAttrInitial.clone();
+		lines[this.cursorY-1] = line;
+		lineAttrs[this.cursorY-1] = lineAttr;
 		flush();
 	};
 	this.line_erase = function(p) {
@@ -129,9 +161,11 @@ var terminal = (function(){
 	this.line_delete = function(p) {
 		for (var i=this.cursorX-1+p;i<=this.windowW;i++) {
 			line[i-p] = line[i];
+			lineAttr[i-p] = lineAttr[i];
 		}
 		for (var i=0;i<p;i++) {
-			line[this.windowW-i] = ' ';
+			line[this.windowW-i] = lineInitial[0];
+			lineAttr[this.windowW-i] = lineAttrInitial[0];
 		}
 	}
 	/*this.line_backspace = function() {
@@ -148,6 +182,15 @@ var terminal = (function(){
 		//todo:scroll
 	}
 	this.setColor = function(col) {
+		if (col == 0 || col==1) {
+			attr = 7;
+		} else if (col>=30 && col<=39) {
+			if (col==39) col = 37;
+			attr = (attr & (~7)) | (col-30);
+		} else if (col>=40 && col<=49) {
+			if (col==49) col = 40;
+			attr = (attr & (~56)) | ((col-40)*8);
+		}
 	};
 	this.setCursorX = function(p) {
 		this.cursorX = p;
@@ -158,12 +201,17 @@ var terminal = (function(){
 	};
 	function scrollUp() {
 		line = lineInitial.clone();
-		for (var i=0;i<lines.length;i++) lines[i] = lines[i+1];
-		setLine(line);
+		lineAttr = lineAttrInitial.clone();
+		for (var i=0;i<lines.length;i++) {
+			lines[i] = lines[i+1];
+			lineAttrs[i] = lineAttrs[i+1];
+		}
+		lines[this.cursorY-1] = line;
+		lineAttrs[this.cursorY-1] = lineAttr;
 	};
 	function appendLine() {
 		$('#main').append('<pre>&nbsp;</pre>');
-		lineDiv = $('#main pre:last');
+		lineDiv = $('#main > pre:last');
 		//lineDiv.css('background-color','blue');
 	};
 
@@ -186,6 +234,7 @@ var terminal = (function(){
 				//if (this.cursorY==1) lineDiv.css('background-color','red');
 			}
 			line = lines[this.cursorY-1];
+			lineAttr = lineAttrs[this.cursorY-1];
 			if (!lineDiv.length) {
 				clog3(this.cursorY);
 				appendLine();
@@ -195,7 +244,7 @@ var terminal = (function(){
 	};
 	this.writeTab = function() {
 		var t = 1+8*Math.floor((this.cursorX-1+8)/8);
-		for (var i=this.cursorX+1;i<=t;i++) line[i-1] = " ";
+		for (var i=this.cursorX+1;i<=t;i++) {line[i-1] = " ";lineAttr[i-1] = attr;}
 		this.cursorX = t;
 		this.flush();
 	};
