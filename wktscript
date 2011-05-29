@@ -1,0 +1,15 @@
+#!/usr/bin/php
+<?php
+function writeScript($data) {
+	$content = array('<script>');
+	$content[] = $data;
+	$content[] = '</script>';
+	$content = implode('',$content);
+	echo chr(27).'!'.strlen($content).'!';
+	echo $content;
+}
+$t = '';
+for ($i=1;$i<count($argv);$i++) {
+	$t.=($t?' ':'').$argv[$i];
+}
+writeScript($t);

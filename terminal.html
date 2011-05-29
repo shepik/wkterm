@@ -120,8 +120,22 @@ function print(data) {
 	$('#main').scrollTop(1000000);
 }
 $(document).ready(function() {
+	terminal.charW = $('#singleChar span').width();
+	terminal.charH = $('#singleChar').height();
+	console.log(terminal.charW+"x"+terminal.charH);
+	$('#singleChar').remove();
 	terminal.init();
+	terminal.setSize($(window).width(), $(window).height());
+
 });
+$(window).resize(function() {
+	var w= $(window).width()-20;
+	var h= $(window).height()-10;
+	terminal.setSize(w, h);
+	$('BODY').css({width:$(window).width(), height: $(window).height() });
+	$('#main').css({width:$(window).width(), height: $(window).height() });
+});
+
 
 /*$(window).keypress(function(p) {
 //	console.log(p.which);
@@ -137,6 +151,7 @@ $(document).ready(function() {
 <input type="text" id="paster" style="display:none;width:100px;position:absolute;left:0px;top:0px;"/>
 	<div id="scroller">
 		<div id="main">
+			<pre id="singleChar"><span>Z</span></pre>
 		</div>
 	</div>
 </body>

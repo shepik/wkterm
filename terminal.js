@@ -35,6 +35,8 @@ var terminal = (function(){
 	this.forecolor = '37';
 	this.windowW = 80;
 	this.windowH = 24;
+	this.charW = 9;
+	this.charH = 14;
 	
 	var last_forecolor = this.forecolor;
 	var last_backcolor = this.backcolor;
@@ -64,12 +66,10 @@ var terminal = (function(){
 		//if (b) lineDiv.css({'background-color':'red'});
 	}
 	function write(ch) {
+		if (this.cursorX>this.windowW) {this.setCursorX(1); this.setCursorY(this.cursorY+1);}
 		clog1(this.cursorY+","+this.cursorX + " - " + ch);
 		line[this.cursorX-1] = ch;
 		this.cursorX++;
-		if (this.cursorX>80) {this.setCursorX(1); this.setCursorY(this.cursorY+1);}
-//		if (this.cursorX>80) this.cursorX = 1;
-		
 	}
 	
 	function setLine(newline) {
@@ -89,7 +89,7 @@ var terminal = (function(){
 		this.setCursorY(c);
 	}
 	this.init = function() {
-		for (var i=0;i<30;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
+		for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
 		appendLine();
 		line = lines[0];
@@ -97,6 +97,17 @@ var terminal = (function(){
 		this.setCursorY(1);
 		//lineDiv.css('background-color','yellow');
 	};
+	this.setSize = function(w_px, h_px) {
+		var w = Math.floor(w_px/this.charW);
+		var h = Math.floor(h_px/this.charH);
+		if (w>0 && h>0) {
+			console.log(w+"x"+h);
+			this.windowW = w;
+			this.windowH = h;
+			setTerminalSize(h,w);
+			this.init();
+		}
+	}
 	this.line_removeFrom = function(p,cnt) {
 		for (var i=p;i<=this.windowW;i++) line[i-1] = " ";
 		flush();

@@ -22,7 +22,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <assert.h>
-
+#include <sys/ioctl.h>
 #include <iostream>
 #include <gio/gio.h>
 #include <gio/gunixinputstream.h>
@@ -54,6 +54,16 @@ static JSValueRef sendToInput(JSContextRef ctx, JSObjectRef /*function*/, JSObje
 */	
 	return JSValueMakeUndefined(ctx);
 }
+static JSValueRef setTerminalSize(JSContextRef ctx, JSObjectRef /*function*/, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
+	assert(argumentCount==2);
+	JSValueRef ex;
+	struct winsize sz;
+	sz.ws_row = (int)JSValueToNumber(ctx,arguments[0],&ex);
+	sz.ws_col = (int)JSValueToNumber(ctx,arguments[1],&ex);
+
+	int ret = ioctl(fdMaster, TIOCSWINSZ, &sz);
+	return JSValueMakeUndefined(ctx);
+}
 
 static void window_object_cleared_cb(WebKitWebView *web_view, WebKitWebFrame *web_frame, gpointer context, gpointer arg3, gpointer user_data) {
 
@@ -61,8 +71,12 @@ static void window_object_cleared_cb(WebKitWebView *web_view, WebKitWebFrame *we
 	JSObjectRef globalObj = JSContextGetGlobalObject(jsContext);
 
 	JSValueRef exception=0;
-	JSValueRef jsfoo=JSObjectMakeFunctionWithCallback(jsContext,JSStringCreateWithUTF8CString("sendToInput"),sendToInput);
-	JSObjectSetProperty(jsContext, globalObj,JSStringCreateWithUTF8CString("sendToInput"), jsfoo,kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, &exception);
+	JSValueRef jsfunc;
+	jsfunc=JSObjectMakeFunctionWithCallback(jsContext,JSStringCreateWithUTF8CString("sendToInput"),sendToInput);
+	JSObjectSetProperty(jsContext, globalObj,JSStringCreateWithUTF8CString("sendToInput"), jsfunc,kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, &exception);
+
+	jsfunc=JSObjectMakeFunctionWithCallback(jsContext,JSStringCreateWithUTF8CString("setTerminalSize"),setTerminalSize);
+	JSObjectSetProperty(jsContext, globalObj,JSStringCreateWithUTF8CString("setTerminalSize"), jsfunc,kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, &exception);
 }
 
 #include "cJSON.h"
