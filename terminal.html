@@ -70,9 +70,9 @@ body {
 
 
 #cursor {
-	position:fixed;
+	position:absolute;
 	left:0px;top:0px;
-	background:#60ff60;
+	background:#20ff20;
 	color:green;
 	width:10px;
 	height:10px;
@@ -175,10 +175,7 @@ $(window).resize(function() {
 <body class="m40 m37">
 <input type="text" id="paster" style="display:none;width:100px;position:absolute;left:0px;top:0px;"/>
 	<div id="scroller">
-		<div id="main">
-			<pre id="singleChar"><span>Z</span></pre>
-			<div id="cursor">&nbsp;</div>
-		</div>
+		<div id="main"><div id="cursor">&nbsp;</div><pre id="singleChar"><span>Z</span></pre></div>
 	</div>
 </body>
 </html>

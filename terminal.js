@@ -68,11 +68,14 @@ var terminal = (function(){
 		//var str = line.join('');
 		//var res = str.substr(0,this.cursorX-1) + "<b>" + str[this.cursorX-1] + "</b>" + str.substr(this.cursorX);
 		//lineDiv.html(res+"&nbsp;");
-		console.log($('#main').height());
-		console.log(this.windowH);
-		console.log(this.cursorY);
-		$('#cursor').css('left',((this.cursorX-1)*this.charW)+"px").css('top',($('#main').height()-(1+this.windowH-this.cursorY)*this.charH)+"px") ;
-		console.log((this.cursorX-1)*this.charW);
+//		console.log($('#main').height());
+//		console.log(this.windowH);
+//		console.log(this.cursorY);
+		var l = ((this.cursorX-1)*this.charW);
+		var h = lineDiv.offset().top + $('#main').scrollTop();
+		//var h = ($('#main').height()-(1+this.windowH-this.cursorY)*this.charH);
+		$('#cursor').css('left',l+"px").css('top',h+"px") ;
+//		console.log((this.cursorX-1)*this.charW);
 	}
 	function getColorClass(attr) {
 		var b = (attr&64)?'b':'';
@@ -118,7 +121,7 @@ var terminal = (function(){
 		this.setCursorY(c);
 	}
 	this.init = function() {
-		for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
+		//for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
 		for (var i=0;i<this.windowH;i++) lineAttrs[i] = lineAttrInitial.clone();
 		appendLine();
@@ -212,8 +215,12 @@ var terminal = (function(){
 		this.cursorX = p;
 	};
 	this.insertDiv = function (data) {
+		//$('#main > pre:last').before('<div></div>');
 		$('#main').append('<div></div>');
 		$('#main > div:last').html(data);
+		this.init();
+		//appendLine();
+		//	this.setCursorY(1);
 	};
 	function scrollUp() {
 		line = lineInitial.clone();
@@ -233,6 +240,7 @@ var terminal = (function(){
 
 	this.setCursorY = function(p) {
 		if (p==this.cursorY) return;
+		//console.log("cy "+p);
 		flush();
 		this.cursorY = p;
 		if (this.cursorY>this.windowH) {
@@ -242,20 +250,37 @@ var terminal = (function(){
 			appendLine();
 			flush();
 		} else {
-			var t = $('#main > pre');
+			/*var t = $('#main')[0].childNodes;
 			if (t.length<this.windowH) {
 				lineDiv = $(t[this.cursorY-1]);
 			} else {
 				lineDiv = $(t[t.length - (this.windowH-this.cursorY)-1]);
-				//if (this.cursorY==1) lineDiv.css('background-color','red');
+			}*/
+			var arr = $('#main')[0].childNodes;
+			var cnt = this.windowH;
+			var ind = arr.length-1;
+			while (ind>=0 && cnt>0) {
+				if (arr[ind].tagName!="PRE") {ind++; break;}
+				cnt--;
+				ind--;
 			}
+			if (cnt==0) {
+				lineDiv = $(arr[ind + this.cursorY-1]);
+			} else if (this.windowH - cnt >= this.cursorY-1) {
+				lineDiv = $(arr[ind + this.cursorY-1]);
+			} else {
+				for (var i=this.windowH - cnt;i<this.cursorY-1;i++) {
+					appendLine();
+				}
+			}
+
 			line = lines[this.cursorY-1];
 			lineAttr = lineAttrs[this.cursorY-1];
-			if (!lineDiv.length) {
+			/*if (!lineDiv.length) {
 				clog3(this.cursorY);
 				appendLine();
 				flush();
-			}
+			}*/
 		}
 	};
 	this.writeTab = function() {
