@@ -139,8 +139,8 @@ $(window).resize(function() {
 	var w= $(window).width();
 	var h= $(window).height();
 	terminal.setSize(w*1-20, h*1-10);
-	$('BODY').css({width:w+"px", height: h+"px" });
-	$('#main').css({width:w+"px", height: h+"px" });
+	$('BODY').css('width',w+"px").css('height',h+"px");
+	$('#main').css('width',w+"px").css('height',h+"px");
 });
 
 
