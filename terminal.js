@@ -172,6 +172,16 @@ var terminal = (function(){
 			lineAttr[this.windowW-i] = lineAttrInitial[0];
 		}
 	}
+	this.line_insert = function(p) {
+		for (var i=this.windowW-p;i>=this.cursorX;i--) {
+			line[i+p-1] = line[i-1];
+			lineAttr[i+p-1] = lineAttr[i-1];
+		}
+		for (var i=0;i<p;i++) {
+			line[this.cursorX+i] = lineInitial[0];
+			lineAttr[this.cursorX+i] = lineAttrInitial[0];
+		}
+	}
 	/*this.line_backspace = function() {
 		this.cursorX--;
 		line[this.cursorX-1] = ' ';
