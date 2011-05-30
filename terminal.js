@@ -24,7 +24,7 @@ var clog1 = nothing;
 var clog2 = nothing;
 var clog3 = nothing;
 var clog4 = nothing;
-
+/*
 var clog1 = function(p) {console.log(p);};
 var clog2 = function(p) {console.log(p);};
 var clog3 = function(p) {console.log(p);};
@@ -92,8 +92,8 @@ var terminal = (function(){
 			}
 		}
 		l += '</span>';
-		console.log(line.join(','));
-		console.log(lineAttr.join(','));
+		//console.log(line.join(','));
+		//console.log(lineAttr.join(','));
 		lineDiv.html(l);
 		//lineDiv.html(line.join('')+"&nbsp;");
 		//if (b) lineDiv.css({'background-color':'red'});
