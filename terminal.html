@@ -35,22 +35,39 @@ body {
 	background-color:#008000;
 	font-weight:normal;
 }
-.m30 { color: black; }
-.m31 { color: red; }
-.m32 { color: green; }
-.m33 { color: yellow; }
-.m34 { color: blue; }
-.m35 { color: magenta; }
-.m36 { color: cyan; }
-.m37 { color: white; }
-.m40 { background-color: black; }
-.m41 { background-color: red; }
-.m42 { background-color: green; }
-.m43 { background-color: yellow; }
-.m44 { background-color: blue; }
-.m45 { background-color: magenta; }
-.m46 { background-color: cyan; }
-.m47 { background-color: white; }
+.m30 { color: #000000; }
+.m31 { color: #a80000; }
+.m32 { color: #00a800; }
+.m33 { color: #a85400; }
+.m34 { color: #0000a8; }
+.m35 { color: #a800a8; }
+.m36 { color: #00a8a8; }
+.m37 { color: #a8a8a8; }
+.bm30 { color: #545454; font-weight:bold; }
+.bm31 { color: #fc5454; font-weight:bold; }
+.bm32 { color: #54fc54; font-weight:bold; }
+.bm33 { color: #fcfc54; font-weight:bold; }
+.bm34 { color: #5454fc; font-weight:bold; }
+.bm35 { color: #fc54fc; font-weight:bold; }
+.bm36 { color: #54fcfc; font-weight:bold; }
+.bm37 { color: #fcfcfc; font-weight:bold; }
+.m40 { background-color: #000000; }
+.m41 { background-color: #a80000; }
+.m42 { background-color: #00a800; }
+.m43 { background-color: #a85400; }
+.m44 { background-color: #0000a8; }
+.m45 { background-color: #a800a8; }
+.m46 { background-color: #00a8a8; }
+.m47 { background-color: #a8a8a8; }
+.bm40 { background-color: #545454; }
+.bm41 { background-color: #fc5454; }
+.bm42 { background-color: #54fc54; }
+.bm43 { background-color: #fcfc54; }
+.bm44 { background-color: #5454fc; }
+.bm45 { background-color: #fc54fc; }
+.bm46 { background-color: #54fcfc; }
+.bm47 { background-color: #fcfcfc; }
+
 
 #cursor {
 	position:fixed;
@@ -132,7 +149,7 @@ $(document).ready(function() {
 	terminal.init();
 	terminal.setSize($(window).width(), $(window).height());
 
-	$('#cursor').css({width: terminal.charW+"px", height: terminal.charH+"px"});
+	$('#cursor').css('width',terminal.charW+"px").css('height',terminal.charH+"px");
 
 });
 $(window).resize(function() {

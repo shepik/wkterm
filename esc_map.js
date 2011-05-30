@@ -25,7 +25,8 @@
 //NP: non-printable character
 var map = {
 	'CSI Ps K' : function(p) { if (p==0 || typeof(p)=='undefined') this.line_removeFrom(this.cursorX); else if (p==1) this.line_removeTo(this.cursorX); else this.line_clear();}, //Erase in Line (EL).
-	'CSI Pm m' : function(attr) { for (var i=0;i<arguments.length;i++) this.setColor(arguments[i]);/*set color*/  }, //Character Attributes (SGR).
+	'CSI m' : function(attr) { this.setColor(0); }, //Character Attributes (SGR).
+	'CSI Pm m' : function(attr) { if (typeof('attr')=='undefined') this.setColor(0); for (var i=0;i<arguments.length;i++) this.setColor(arguments[i]);/*set color*/  }, //Character Attributes (SGR).
 	'CSI Ps ; Ps H' : function(y,x,z) { clog1(y+"," + x + " => pos");this.setCursorY(y?y*1:1); this.setCursorX(x?x*1:1); }, //Cursor Position [row;column] (default = [1,1]) (CUP).
 	'CSI Ps H' : function(y) { this.setCursorX(1); this.setCursorY(y?y*1:1); }, //Cursor Position [row;column] (default = [1,1]) (CUP).
 	'ESC ( Char': function(ch) { }, //Designate G0 Character Set (ISO 2022, VT100).

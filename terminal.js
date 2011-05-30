@@ -24,7 +24,7 @@ var clog1 = nothing;
 var clog2 = nothing;
 var clog3 = nothing;
 var clog4 = nothing;
-/*
+
 var clog1 = function(p) {console.log(p);};
 var clog2 = function(p) {console.log(p);};
 var clog3 = function(p) {console.log(p);};
@@ -75,7 +75,8 @@ var terminal = (function(){
 		console.log((this.cursorX-1)*this.charW);
 	}
 	function getColorClass(attr) {
-		return 'm3'+(attr&7)+' m4'+((attr>>3)&7);
+		var b = (attr&64)?'b':'';
+		return b+'m3'+(attr&7)+' '+'m4'+((attr>>3)&7);
 	}
 	function flush() {
 		//getLine().append('<span class="m'+last_forecolor+' m'+last_backcolor+'">'+buf+'</span>');
@@ -84,15 +85,16 @@ var terminal = (function(){
 		var l = '<span class="'+getColorClass(a)+'">'+line[0];
 		for (var i=1;i<line.length;i++) {
 			if (lineAttr[i]==a) {
-				l += line[i];
+				l += (line[i]||' ').esc();
 			} else {
 				a = lineAttr[i];
-				l += '</span><span class="'+getColorClass(a)+'">' + line[i];
+				l += '</span><span class="'+getColorClass(a)+'">' + (line[i]||' ').esc();
 			}
 		}
 		l += '</span>';
-//		console.log(lineAttr.join(','));
-		lineDiv.html(l+"&nbsp;");
+		console.log(line.join(','));
+		console.log(lineAttr.join(','));
+		lineDiv.html(l);
 		//lineDiv.html(line.join('')+"&nbsp;");
 		//if (b) lineDiv.css({'background-color':'red'});
 	}
@@ -130,7 +132,7 @@ var terminal = (function(){
 		var w = Math.floor(w_px/this.charW);
 		var h = Math.floor(h_px/this.charH);
 		if (w>0 && h>0) {
-//			console.log(w+"x"+h);
+			console.log(w+"x"+h);
 			this.windowW = w;
 			this.windowH = h;
 			setTerminalSize(h,w);
@@ -139,10 +141,12 @@ var terminal = (function(){
 	}
 	this.line_removeFrom = function(p,cnt) {
 		for (var i=p;i<=this.windowW;i++) line[i-1] = " ";
+		for (var i=p;i<=this.windowW;i++) lineAttr[i-1] = lineAttrInitial[0];
 		flush();
 	};
 	this.line_removeTo = function(p) {
 		for (var i=1;i<p;i++) line[i-1] = " ";
+		for (var i=1;i<p;i++) lineAttr[i-1] = lineAttrInitial[0];
 		flush();
 	};
 	this.line_clear = function() {
@@ -182,8 +186,10 @@ var terminal = (function(){
 		//todo:scroll
 	}
 	this.setColor = function(col) {
-		if (col == 0 || col==1) {
+		if (col == 0) {
 			attr = 7;
+		} else if (col==1) {
+			attr = 7+64;
 		} else if (col>=30 && col<=39) {
 			if (col==39) col = 37;
 			attr = (attr & (~7)) | (col-30);

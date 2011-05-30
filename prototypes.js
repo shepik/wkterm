@@ -37,7 +37,11 @@ Object.prototype.bind = function(func) {
 };
 String.prototype.replaceAt=function(index, char) {
 	return this.substr(0, index) + char + this.substr(index+char.length);
-}
+};
+String.prototype.esc = function() {
+	return this.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+};
+
 Object.prototype.clone = function() {
   var newObj = (this instanceof Array) ? [] : {};
   for (i in this) {
