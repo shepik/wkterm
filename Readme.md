@@ -39,5 +39,5 @@ Viewing image via ssh
 ![](http://i51.tinypic.com/2lvgy89.png)
 Viewing downloaded image locally
 
-![](http://i55.tinypic.com/2l12si.png)
+![](http://i53.tinypic.com/2hi9t91.png)
 Viewing sql result
