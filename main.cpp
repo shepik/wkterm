@@ -152,6 +152,10 @@ int main(int argc, char* argv[]) {
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
+	GdkGeometry gdkGeom;
+	gdkGeom.min_width = 100;
+	gdkGeom.min_height = 100;
+	gtk_window_set_geometry_hints(GTK_WINDOW(window),NULL ,&gdkGeom, GDK_HINT_MIN_SIZE);
 	g_signal_connect(window, "destroy", G_CALLBACK(destroy_cb), NULL);
 
 	web_view = web_view = WEBKIT_WEB_VIEW(webkit_web_view_new());
