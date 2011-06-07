@@ -33,11 +33,11 @@ Also, which is in fact the main purpose of the project, wkterm have graphical fe
 
 ## Screenshots:
 
-Downloading and viewing: (yes, i DO know i could just use img src="url")
-![](http://clip2net.com/clip/m31984/1306183985-clip-45kb.png)
+Viewing image via ssh:
+![](http://i52.tinypic.com/30w4b5g.png)
 
-Viewing image by ssh:
-![](http://clip2net.com/clip/m31984/1306180711-clip-197kb.png)
+Viewing downloaded image locally:
+![](http://i51.tinypic.com/2lvgy89.png)
 
-First version (with colors):
-![](http://clip2net.com/clip/m31984/1306026783-clip-70kb.png)
+Viewing table:
+![](http://i55.tinypic.com/2l12si.png)
