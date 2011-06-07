@@ -33,11 +33,11 @@ Also, which is in fact the main purpose of the project, wkterm have graphical fe
 
 ## Screenshots:
 
-Viewing image via ssh:
 ![](http://i52.tinypic.com/30w4b5g.png)
+Viewing image via ssh
 
-Viewing downloaded image locally:
 ![](http://i51.tinypic.com/2lvgy89.png)
+Viewing downloaded image locally
 
-Viewing table:
 ![](http://i55.tinypic.com/2l12si.png)
+Viewing sql result
