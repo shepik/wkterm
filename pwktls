@@ -1,0 +1,102 @@
+#!/usr/bin/python
+import base64
+from cStringIO import StringIO
+import os
+import sys
+import glob
+
+from PIL import Image
+
+def escape(string):
+    return string\
+        .replace('&', '&amp;')\
+        .replace('<', '&lt;')\
+        .replace('>', '&gt;')\
+        .replace('"', '&quot;')\
+        .replace("'", '&#39;')
+
+file_template = (
+    '<div style="'
+    'display:inline-block;height:60px;width:100px;'
+    'padding-left:60px;border:1px solid #808080;">%s</div>')
+
+image_template = (
+    '<span style="'
+    'position:relative;display:inline-block;align-vertical:middle;'
+    'height:60px;width:160px;overflow:hidden;'
+    'border:1px solid #808080;">'
+    '<img src="data:%s;base64,'
+    '%s'
+    '" style="float:left">'
+    '%s'
+    '</span>')
+image_ext = ('.jpeg', '.jpg', '.png', '.gif')
+MIME = {
+    'JPEG': 'image/jpeg',
+    'PNG': 'image/png',
+    'GIF': 'image/gif',
+}
+def get_mime_from_format(format):
+    return MIME.get(format)
+
+def image_content(file):
+    img = Image.open(file)
+    format = img.format
+    img.thumbnail((60, 60), Image.ANTIALIAS)
+    buffer = StringIO()
+    img.save(buffer, img.format)
+    result = base64.b64encode(buffer.getvalue())
+    buffer.close()
+    return result, format
+
+def show_image(file):
+    content, format = image_content(file)
+    return image_template % (
+        get_mime_from_format(format),
+        content,
+        escape(os.path.basename(file))
+    )
+
+def show_file(file):
+    return file_template % escape(os.path.basename(file))
+
+def tell_len(str_io):
+    str_io.seek(0, os.SEEK_END)
+    return str_io.tell()
+
+def flush_buffer(buffer):
+    sys.stdout.write('%s!%s!' % (chr(27), tell_len(buffer)))
+    sys.stdout.write(buffer.getvalue())
+    buffer.close()
+    return StringIO()
+
+def show_files(files):
+    buffer = StringIO()
+    buffer.write('<div>')
+    cntr = 0
+    for file in files:
+        if os.path.basename(file) == '.' or os.path.basename(file) == '..':
+            continue
+        root, ext = os.path.splitext(file)
+        if ext in image_ext:
+            buffer.write(show_image(file))
+        else:
+            buffer.write(show_file(file))
+        cntr += 1
+        # buffer = flush_buffer(buffer)
+    buffer.write('</div>')
+    buffer = flush_buffer(buffer)
+    buffer.close()
+
+def main():
+    skipped_first = False
+    for arg in sys.argv:
+        if not skipped_first:
+            skipped_first = True
+            continue
+
+        show_files(glob.glob('%s/*' % arg) if os.path.isdir(arg) else (arg, ))
+
+
+if __name__ == '__main__':
+    main()
