@@ -230,7 +230,7 @@ var terminal = (function(){
 
 	this.setCursorY = function(p) {
 		if (p==this.cursorY) return;
-		console.log("cy "+p);
+		//console.log("cy "+p);
 		flush();
 		this.cursorY = p;
 		if (this.cursorY>this.windowH) {
@@ -261,7 +261,7 @@ var terminal = (function(){
 			line = lines[this.cursorY-1];
 			lineAttr = lineAttrs[this.cursorY-1];
 		}
-		console.log(lineDiv);
+		//console.log(lineDiv);
 	};
 	this.writeTab = function() {
 		var t = 1+8*Math.floor((this.cursorX-1+8)/8);
