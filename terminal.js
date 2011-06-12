@@ -29,12 +29,11 @@ var clog1 = function(p) {console.log(p);};
 var clog2 = function(p) {console.log(p);};
 var clog3 = function(p) {console.log(p);};
 var clog4 = function(p) {console.log(p);};
-/*
-*/
+//*/
 var terminal = (function(){
 	this.backcolor = '01';
 	this.forecolor = '37';
-	this.windowW = 80;
+	this.windowW = 50;
 	this.windowH = 24;
 	this.charW = 9;
 	this.charH = 14;
@@ -59,21 +58,12 @@ var terminal = (function(){
 	//var cursorXprev = -1;
 	//var cursorYprev = -1;
 	this.flushCursor = function() {
-		//if (this.cursorXprev>0 && this.cursorYprev>0) {
-		//	var y = this.cursorY;
-		//	this.setCursorY(this.cursorYprev);
-		//	this.flush();
-		//	this.setCursorY(y);
-		//}
-		//var str = line.join('');
-		//var res = str.substr(0,this.cursorX-1) + "<b>" + str[this.cursorX-1] + "</b>" + str.substr(this.cursorX);
-		//lineDiv.html(res+"&nbsp;");
 //		console.log($('#main').height());
 //		console.log(this.windowH);
 //		console.log(this.cursorY);
 		var l = ((this.cursorX-1)*this.charW);
-		var h = lineDiv.offset().top + $('#main').scrollTop();
-		//var h = ($('#main').height()-(1+this.windowH-this.cursorY)*this.charH);
+		var off = lineDiv.offset();
+		var h = (off?off.top:0) + $('#main').scrollTop();
 		$('#cursor').css('left',l+"px").css('top',h+"px") ;
 //		console.log((this.cursorX-1)*this.charW);
 	}
@@ -95,11 +85,8 @@ var terminal = (function(){
 			}
 		}
 		l += '</span>';
-		//console.log(line.join(','));
-		//console.log(lineAttr.join(','));
+
 		lineDiv.html(l);
-		//lineDiv.html(line.join('')+"&nbsp;");
-		//if (b) lineDiv.css({'background-color':'red'});
 	}
 	function write(ch) {
 		if (this.cursorX>this.windowW) {this.setCursorX(1); this.setCursorY(this.cursorY+1);}
@@ -120,16 +107,19 @@ var terminal = (function(){
 		for (var i=0;i<this.windowH;i++) {this.setCursorY(i+1); this.line_clear();}
 		this.setCursorY(c);
 	}
-	this.init = function() {
-		//for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
+	
+	this.initLines = function() {
 		for (var i=0;i<this.windowH;i++) lines[i] = lineInitial.clone();
 		for (var i=0;i<this.windowH;i++) lineAttrs[i] = lineAttrInitial.clone();
+	};
+	this.init = function() {
+		//for (var i=0;i<this.windowH;i++) $('#main').append('<pre>&nbsp;</pre>');//temporary
+		initLines();
 		appendLine();
 		line = lines[0];
 		lineAttr = lineAttrs[0];
 		this.cursorY = 0;
 		this.setCursorY(1);
-		//lineDiv.css('background-color','yellow');
 	};
 	this.setSize = function(w_px, h_px) {
 		var w = Math.floor(w_px/this.charW);
@@ -139,7 +129,8 @@ var terminal = (function(){
 			this.windowW = w;
 			this.windowH = h;
 			setTerminalSize(h,w);
-			this.init();
+			makeLineInitial();
+			initLines();
 		}
 	}
 	this.line_removeFrom = function(p,cnt) {
@@ -235,12 +226,11 @@ var terminal = (function(){
 	function appendLine() {
 		$('#main').append('<pre>&nbsp;</pre>');
 		lineDiv = $('#main > pre:last');
-		//lineDiv.css('background-color','blue');
 	};
 
 	this.setCursorY = function(p) {
 		if (p==this.cursorY) return;
-		//console.log("cy "+p);
+		console.log("cy "+p);
 		flush();
 		this.cursorY = p;
 		if (this.cursorY>this.windowH) {
@@ -250,17 +240,11 @@ var terminal = (function(){
 			appendLine();
 			flush();
 		} else {
-			/*var t = $('#main')[0].childNodes;
-			if (t.length<this.windowH) {
-				lineDiv = $(t[this.cursorY-1]);
-			} else {
-				lineDiv = $(t[t.length - (this.windowH-this.cursorY)-1]);
-			}*/
 			var arr = $('#main')[0].childNodes;
 			var cnt = this.windowH;
-			var ind = arr.length-1;
+			var ind = arr.length-2;
 			while (ind>=0 && cnt>0) {
-				if (arr[ind].tagName!="PRE") {ind++; break;}
+				if (arr[ind].tagName!="PRE") {if (ind!=arr.length-1) ind++; break;}
 				cnt--;
 				ind--;
 			}
@@ -276,12 +260,8 @@ var terminal = (function(){
 
 			line = lines[this.cursorY-1];
 			lineAttr = lineAttrs[this.cursorY-1];
-			/*if (!lineDiv.length) {
-				clog3(this.cursorY);
-				appendLine();
-				flush();
-			}*/
 		}
+		console.log(lineDiv);
 	};
 	this.writeTab = function() {
 		var t = 1+8*Math.floor((this.cursorX-1+8)/8);

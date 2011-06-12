@@ -48,6 +48,7 @@ var map = {
 
 	'CSI Ps J':function(opt) { if (opt!=2) clog2("Ps J "+opt); this.clearAll();   },//Erase in Display (ED).
 	'CSI Ps C':function(cnt) { this.setCursorX(this.cursorX + (cnt?cnt*1:1)); }, //Cursor Forward Ps Times (default = 1) (CUF).
+	'CSI Ps A':function(cnt) { this.setCursorY(this.cursorY - (cnt?cnt*1:1)); }, //Cursor Up Ps Times (default = 1) (CUF).
 	'CSI Ps d':function(p) { clog2(p); this.setCursorY(p?p*1:1);},	//Line Position Absolute [row] (default = [1,column]) (VPA).
 	'CSI Ps l':nothing,//Reset Mode (RM).
 	'CSI Ps G':function(p) { this.setCursorX(p?p*1:1);}, //Cursor Character Absolute [column] (default = [row,1]) (CHA).
