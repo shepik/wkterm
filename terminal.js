@@ -210,8 +210,6 @@ var terminal = (function(){
 		$('#main').append('<div></div>');
 		$('#main > div:last').html(data);
 		this.init();
-		//appendLine();
-		//	this.setCursorY(1);
 	};
 	function scrollUp() {
 		line = lineInitial.clone();
@@ -241,13 +239,14 @@ var terminal = (function(){
 			flush();
 		} else {
 			var arr = $('#main')[0].childNodes;
-			var cnt = this.windowH;
+/*			var cnt = this.windowH;
 			var ind = arr.length-2;
 			while (ind>=0 && cnt>0) {
 				if (arr[ind].tagName!="PRE") {if (ind!=arr.length-1) ind++; break;}
 				cnt--;
 				ind--;
 			}
+			console.log((""+cnt)+(" "+ind)+(" "+(this.cursorY-1)));
 			if (cnt==0) {
 				lineDiv = $(arr[ind + this.cursorY-1]);
 			} else if (this.windowH - cnt >= this.cursorY-1) {
@@ -256,8 +255,23 @@ var terminal = (function(){
 				for (var i=this.windowH - cnt;i<this.cursorY-1;i++) {
 					appendLine();
 				}
+			}*/
+			var ind = arr.length-2;
+			var cnt = 0;
+			while (ind>=0 && cnt < this.windowH && arr[ind].tagName=="PRE") {
+				cnt++;
+				ind--;
 			}
-
+			cnt--;ind++;
+/*			console.log($(arr[0]).html());
+			console.log($(arr[1]).html());
+				console.log(ind+" "+this.cursorY+" "+cnt);*/
+			if (this.cursorY-1<=cnt) {
+				lineDiv = $(arr[ind+this.cursorY]);
+			} else {
+				for (;cnt<this.cursorY-1;cnt++) appendLine();
+			}
+		
 			line = lines[this.cursorY-1];
 			lineAttr = lineAttrs[this.cursorY-1];
 		}
