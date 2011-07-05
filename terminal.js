@@ -172,8 +172,8 @@ var terminal = (function(){
 			lineAttr[i+p-1] = lineAttr[i-1];
 		}
 		for (var i=0;i<p;i++) {
-			line[this.cursorX+i] = lineInitial[0];
-			lineAttr[this.cursorX+i] = lineAttrInitial[0];
+			line[this.cursorX+i-1] = lineInitial[0];
+			lineAttr[this.cursorX+i-1] = lineAttrInitial[0];
 		}
 	}
 	/*this.line_backspace = function() {
