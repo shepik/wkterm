@@ -35,16 +35,20 @@ Also, which is in fact the main purpose of the project, wkterm have graphical fe
 ## Screenshots:
 
 Viewing image via ssh
+
 ![](http://i52.tinypic.com/30w4b5g.png)
 
 CPU usage. It's possible to run both utilities on the remote machine (that is on the screenshot), or run gen_cpu on the remote and run wktgraph locally (like,  "(ssh shepik@thiamis ./gen_cpu ) | ./wktgraph" )
 gen_cpu is a simple utility which just prints out current cpu usage, one value in one line each half a second. You can run it in regular console, too.
+
 ![](http://i.imgur.com/vJXKU.png)
 
 Viewing downloaded image locally
+
 ![](http://i51.tinypic.com/2lvgy89.png)
 
 Viewing sql result
+
 ![](http://i53.tinypic.com/2hi9t91.png)
 
 
