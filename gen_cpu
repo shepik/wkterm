@@ -1,0 +1,22 @@
+#!/usr/bin/php
+<?php
+	function get_usage() {
+		$data = file('/proc/stat');
+		$data = preg_split('/ /',$data[0], 0, PREG_SPLIT_NO_EMPTY);
+		unset($data[0]);
+		return array_values($data);
+	}
+
+	$curr = get_usage();
+	while (true) {
+		$prev = $curr;
+		usleep(500000);
+		$curr = get_usage();
+		$sp = 0; foreach ($prev as $v) $sp+=$v;
+		$sc = 0; foreach ($curr as $v) $sc+=$v;
+		//$val = 100.0*($curr[0]+$curr[1]+$curr[2]-$prev[0]-$prev[1]-$prev[2]) / ($sc-$sp);
+		$val = 100.0*($curr[0]-$prev[0]) / ($sc-$sp);
+		echo $val."\n";
+		flush();
+	}
+	

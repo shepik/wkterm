@@ -222,6 +222,10 @@ var terminal = (function(){
 		//appendLine();
 		//	this.setCursorY(1);
 	};
+	this.insertJs = function(data) {
+		$('#main').append('<script>'+data+'</script>');
+	};
+		//$('#main > pre:last').before('<div></div>');
 	function scrollUp() {
 		line = lineInitial.clone();
 		lineAttr = lineAttrInitial.clone();

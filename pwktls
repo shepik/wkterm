@@ -5,7 +5,7 @@ import os
 import sys
 import glob
 
-from PIL import Image
+import Image
 
 def escape(string):
     return string\
