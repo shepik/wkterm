@@ -57,13 +57,23 @@ var map = {
 		
 	'ESC 7': function() { this.oldX = this.cursorX; this.oldY = this.cursorY; }, //Save Cursor (DECSC).
 	'ESC 8': function() { this.setCursorX(this.oldX); this.setCursorY(this.oldY); }, //Restore Cursor (DECRC).
-		
+	
 	'ESC ! Ps ! ': function(len) {
 		len = len*1;
 		return function(text,pos){
 			console.log("waiting for "+(pos+len)+", now "+text.length);
 			if (text.length<pos+len) return false;
 			this.insertDiv(text.substr(pos,len));
+			return [true, text.substring(pos+len)];
+		};
+	},
+	
+	'ESC ! Ps # ': function(len) {
+		len = len*1;
+		return function(text,pos){
+			console.log("waiting for "+(pos+len)+", now "+text.length);
+			if (text.length<pos+len) return false;
+			this.insertJs(text.substr(pos,len));
 			return [true, text.substring(pos+len)];
 		};
 	},
@@ -84,6 +94,7 @@ map.forEach(function(func, k) {
 	key = key.replaceAll('[','\\[');
 	key = key.replaceAll('?','\\?');
 	key = key.replaceAll('!','\\!');
+	key = key.replaceAll('#','\\#');
 	key = key.replaceAll('(','\\(');
 	
 	key = key.replaceAll('Ps','(NUM*)');

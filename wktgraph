@@ -1,0 +1,45 @@
+#!/usr/bin/php
+<?php
+function xwrite($content, $type = '!') {
+	if (is_array($content)) $content = implode('',$content);
+	$data = chr(27).'!'.(strlen($content)).$type.$content;
+	echo $data;
+	flush();
+}
+
+declare(ticks = 1);
+function sig_handler($signo) {
+	global $id;
+	xwrite("chart{$id}.stop();",'#');
+	exit;
+}
+function getline($fd) {
+	$line = trim(fgets($fd));
+	$d = preg_split('/ /',$line, 0, PREG_SPLIT_NO_EMPTY);
+	return $d;
+}
+
+	pcntl_signal(SIGINT, "sig_handler");
+
+	mb_internal_encoding('utf8');
+	$id = intval(mt_rand());
+	//$content[] = '<script type="text/javascript" src="smoothie.js"></script>';
+	if (feof(STDIN)) exit;
+	$line = getline(STDIN);
+
+	xwrite('<canvas id="chart'.$id.'" width="600" height="200" style="background-color:red"></canvas>','!');
+	xwrite("var chart{$id} = new SmoothieChart({minValue:0});",'#');
+	xwrite("var data{$id} = [];",'#');
+	foreach ($line as $k=>$item) {
+		xwrite("data{$id}[{$k}] = new TimeSeries();",'#');
+		xwrite("chart{$id}.addTimeSeries(data{$id}[{$k}], { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 2 });",'#');
+	}
+	xwrite("var el = document.getElementById('chart{$id}');",'#');
+	xwrite("chart{$id}.streamTo(el, 500);",'#');
+	$i = 0;
+	while (!feof(STDIN)) {
+		$line = getline(STDIN);
+		foreach ($line as $k=>$item) {
+			xwrite("data{$id}[{$k}].append(new Date().getTime(),".floatval($item).');','#');
+		}
+	}

@@ -212,6 +212,10 @@ var terminal = (function(){
 		$('#main > div:last').html(data);
 		this.init();
 	};
+	this.insertJs = function(data) {
+		$('#main').append('<script>'+data+'</script>');
+	};
+		//$('#main > pre:last').before('<div></div>');
 	function scrollUp() {
 		line = lineInitial.clone();
 		lineAttr = lineAttrInitial.clone();

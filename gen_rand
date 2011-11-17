@@ -1,0 +1,9 @@
+#!/usr/bin/php
+<?php
+	while (true) {
+		echo mt_rand()/1.0/mt_getrandmax();
+		echo "\n";
+		flush();
+		usleep(1000000);
+	}
+	
