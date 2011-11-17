@@ -30,6 +30,7 @@ var clog2 = function(p) {console.log(p);};
 var clog3 = function(p) {console.log(p);};
 var clog4 = function(p) {console.log(p);};
 //*/
+
 var terminal = (function(){
 	this.backcolor = '01';
 	this.forecolor = '37';

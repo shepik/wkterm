@@ -92,13 +92,30 @@ table tr.odd {
 <script>
 
 var data_prev = '';
-function print(data) {
+var print = rprint;
+var print_test = function() {};
+
+if (0) {
+	var print = function(data){};
+	var print_test = function() {
+	}
+}
+
+function rprint(data) {
 	var res = "";
 	if (data_prev) {
 		data = data_prev + data;
 		data_prev = "";
 	}
 	var l = data.length;
+	
+	var t = [];
+	for (var i=0;i<l;i++) {
+		var ch = data[i];
+		t.push(data.charCodeAt(i)+ch);
+	}
+//	console.log(t.join(" "));
+	
 	var i=0;
 	while (i<l) {
 		var ch = data[i];
@@ -152,6 +169,7 @@ $(document).ready(function() {
 	$('#cursor').css('width',terminal.charW+"px").css('height',terminal.charH+"px");
 	
 	$(window).resize();
+	print_test();
 });
 $(window).resize(function() {
 	var w= $(window).width();

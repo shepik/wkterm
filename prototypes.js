@@ -44,7 +44,7 @@ String.prototype.esc = function() {
 
 Object.prototype.clone = function() {
   var newObj = (this instanceof Array) ? [] : {};
-  for (i in this) {
+  for (var i in this) {
     if (i == 'clone') continue;
     if (this[i] && typeof this[i] == "object") {
       newObj[i] = this[i].clone();
@@ -64,4 +64,31 @@ function printStackTrace() {
 		currentFunction = currentFunction.caller;
 	}
 	console.info('stack trace', callstack.join("\n"));
+};
+
+function dump(arr,level_max,level) {
+	var dumped_text = "";
+	if(!level) level = 0;
+
+	//The padding given at the beginning of the line.
+	var level_padding = "";
+	for(var j=0;j<level+1;j++) level_padding += "    ";
+	
+	if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+		if (level>=level_max) return level_padding+((""+arr).substr(0,30))+"\n";
+		for(var item in arr) {
+			var value = arr[item];
+			
+			if(typeof(value) == 'object') { //If it is an array,
+				dumped_text += level_padding + "'" + item + "' ...\n";
+				dumped_text += dump(value,level_max,level+1);
+			} else {
+				dumped_text += level_padding + "'" + item + "' => \"" + (""+value).substr(0,30) + "\"\n";
+			}
+		}
+	} else { //Stings/Chars/Numbers etc.
+		dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+	}
+	return dumped_text;
 }
+Object.prototype.dump = function(lev){return dump.apply(null,[this,lev]);};
