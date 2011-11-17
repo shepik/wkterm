@@ -58,7 +58,7 @@ function key_ev_supress(ev) {
 
 function keypress(ev) {
   if (!ev) var ev=window.event;
-	console.log(dump(ev,1));
+	//console.log(dump(ev,1));
 
     if (ev.ctrlKey && !ev.altKey && !ev.shiftKey && (ev.keyCode==86 || ev.keyCode==118)) return false;
 
@@ -249,7 +249,7 @@ function paste_from_clipboard() {
 
 function init() {
 	document.onkeypress=keypress;
-	//document.onkeydown=keydown;
+	document.onkeydown=keydown;
 }
 
 function create_ctrlkey_menu() {
