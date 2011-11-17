@@ -109,6 +109,10 @@ SmoothieChart.prototype.stop = function() {
     clearInterval(this.timer);
     this.timer = undefined;
   }
+  if (this.boundsTimer) {
+    clearInterval(this.boundsTimer);
+    this.boundsTimer = undefined;
+  }
 };
 
 SmoothieChart.prototype.render = function(canvas, time) {

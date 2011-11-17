@@ -94,6 +94,7 @@ map.forEach(function(func, k) {
 	key = key.replaceAll('[','\\[');
 	key = key.replaceAll('?','\\?');
 	key = key.replaceAll('!','\\!');
+	key = key.replaceAll('#','\\#');
 	key = key.replaceAll('(','\\(');
 	
 	key = key.replaceAll('Ps','(NUM*)');

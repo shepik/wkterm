@@ -212,6 +212,7 @@ var terminal = (function(){
 		this.init();
 	};
 	this.insertJs = function(data) {
+		console.log(data);
 		$('#main').append('<script>'+data+'</script>');
 	};
 		//$('#main > pre:last').before('<div></div>');

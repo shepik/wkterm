@@ -2,24 +2,28 @@
 <?php
 function xwrite($content, $type = '!') {
 	if (is_array($content)) $content = implode('',$content);
-	echo chr(27).'!'.mb_strlen($content).$type;
-	echo $content;
+	$data = chr(27).'!'.(strlen($content)).$type.$content;
+	echo $data;
 	flush();
 }
 
+declare(ticks = 1);
+function sig_handler($signo) {
+	xwrite('chart.stop();','#');
+	exit;
+}
+
+	pcntl_signal(SIGINT, "sig_handler");
+
 	mb_internal_encoding('utf8');
-	$content = array();
 	$id = intval(mt_rand());
 	//$content[] = '<script type="text/javascript" src="smoothie.js"></script>';
-	xwrite('<canvas id="chart'.$id.'" width="600" height="200" style="background-color:red"></canvas>');
-	xwrite('
-		var data = new TimeSeries();
-		var chart = new SmoothieChart();
-		chart.addTimeSeries(data, { strokeStyle: "rgba(0, 255, 0, 1)", fillStyle: "rgba(0, 255, 0, 0.2)", lineWidth: 2 });
-		var el = document.getElementById("chart'.$id.'");
-		chart.streamTo(el, 500);
-		var p;
-	','#');
+	xwrite('<canvas id="chart'.$id.'" width="600" height="200" style="background-color:red"></canvas>','!');
+	xwrite('var data = new TimeSeries();','#');
+	xwrite('var chart = new SmoothieChart({minValue:0});','#');
+	xwrite('chart.addTimeSeries(data, { strokeStyle: "rgba(0, 255, 0, 1)", fillStyle: "rgba(0, 255, 0, 0.2)", lineWidth: 2 });','#');
+	xwrite('var el = document.getElementById("chart'.$id.'");','#');
+	xwrite('chart.streamTo(el, 500);','#');
 	$i = 0;
 	while (!feof(STDIN)) {
 		$line = trim(fgets(STDIN));
