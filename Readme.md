@@ -5,6 +5,26 @@ wkterm is a Webkit Terminal. It's built with webkit-gtk, so it runs in linux. Bu
 In difference with [TermKit](https://github.com/unconed/TermKit/) (which this project was inspired by), wkterm is real terminal emulator and it does aim to host 'vim', mc, top or emacs or anything else. 
 Also, which is in fact the main purpose of the project, wkterm have graphical features (such as inline image viewing - see imgcat source). Graphical features are implemented by using custom escape sequences. There's another possibility also to recognize file format on the fly (that's, when we see jpeg bitmap header, we treat it as bitmap, when we see video, we show video player).
 
+## Screenshots:
+
+Viewing image via ssh
+
+![](http://i52.tinypic.com/30w4b5g.png)
+
+CPU usage. It's possible to run both utilities on the remote machine (that is on the screenshot), or run gen_cpu on the remote and run wktgraph locally (like,  "(ssh shepik@thiamis ./gen_cpu ) | ./wktgraph" )
+gen_cpu is a simple utility which just prints out current cpu usage, one value in one line each half a second. You can run it in regular console, too.
+
+![](http://i.imgur.com/vJXKU.png)
+
+Viewing downloaded image locally
+
+![](http://i51.tinypic.com/2lvgy89.png)
+
+Viewing sql result
+
+![](http://i53.tinypic.com/2hi9t91.png)
+
+
 ## Current todo:
 
 1. (almost done) Proper keyboard handling. I press any non-character key (like arrow-up, or F1, or Ctrl+C, or Esc), esc-sequence should be sent.
@@ -31,24 +51,4 @@ Also, which is in fact the main purpose of the project, wkterm have graphical fe
 3. wkttable - that's for 'mysql -e "SELECT * FROM table" | ./wttable' and other types of text-to-real table conversions
 4. wktgraph - draw simple charts in realtime. cpu usage, requests per second, average response time..
 4. ... ?
-
-## Screenshots:
-
-Viewing image via ssh
-
-![](http://i52.tinypic.com/30w4b5g.png)
-
-CPU usage. It's possible to run both utilities on the remote machine (that is on the screenshot), or run gen_cpu on the remote and run wktgraph locally (like,  "(ssh shepik@thiamis ./gen_cpu ) | ./wktgraph" )
-gen_cpu is a simple utility which just prints out current cpu usage, one value in one line each half a second. You can run it in regular console, too.
-
-![](http://i.imgur.com/vJXKU.png)
-
-Viewing downloaded image locally
-
-![](http://i51.tinypic.com/2lvgy89.png)
-
-Viewing sql result
-
-![](http://i53.tinypic.com/2hi9t91.png)
-
 
